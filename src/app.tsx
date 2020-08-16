@@ -26,7 +26,7 @@ const App: React.FunctionComponent<{}> = () => {
     let __PIECE_ID__ = 0
 
     for (let i = 0; i < 8; ++i)
-      pieces.push({ id: __PIECE_ID__++, color, type: PieceTypes.PAWN, position: { x: i, y: pawnY  }, movedFromStart: false} as PawnParams)
+      pieces.push({ id: __PIECE_ID__++, color, type: PieceTypes.PAWN, position: { x: i, y: pawnY  }})
     pieces.push({ id: __PIECE_ID__++, color, type: PieceTypes.ROOK  , position: { x: 0, y: pieceY }})
     pieces.push({ id: __PIECE_ID__++, color, type: PieceTypes.KNIGHT, position: { x: 1, y: pieceY }})
     pieces.push({ id: __PIECE_ID__++, color, type: PieceTypes.BISHOP, position: { x: 2, y: pieceY }})
@@ -56,7 +56,7 @@ const App: React.FunctionComponent<{}> = () => {
       if (piece.id != selectedPiece.id || piece.color != selectedPiece.color)
         return piece
       if (piece.type === PieceTypes.PAWN)
-        return { ...piece, position, movedFromStart: true }
+        return { ...piece, position, hasMoved: true }
       return { ...piece, position }
     }).filter(piece => !pieceOnPosition || piece != pieceOnPosition)
 
@@ -90,13 +90,24 @@ const App: React.FunctionComponent<{}> = () => {
   const getPawnMoves = (position: Vector, color: PlayerColor): Array<Vector> => {
     const moves: Array<Vector> = []
 
-    const movedFromStart = (boardPieces[`${position.x}-${position.y}`] as PawnParams)?.movedFromStart
-    const numberOfMoves = movedFromStart ? 1 : 2
+    const hasMoved = (boardPieces[`${position.x}-${position.y}`] as PawnParams)?.hasMoved
     /** TODO: Dynamic direction depending on which color is on top and which on bottom. */
     const direction = color === PlayerColor.WHITE ? -1 : 1
-    for (let i = 1; i <= numberOfMoves; ++i)
-      if (position.y + i * direction <= 7 && position.y + i * direction >= 0)
-        moves.push({ x: position.x, y: position.y + i * direction })
+
+    if (direction > 0 && position.y + direction <= 7 && !boardPieces[`${position.x}-${position.y + direction}`])
+      moves.push({ x: position.x, y: position.y + direction })
+    if (direction < 0 && position.y + direction >= 0 && !boardPieces[`${position.x}-${position.y + direction}`])
+      moves.push({ x: position.x, y: position.y + direction })
+
+    if (!hasMoved && direction > 0 && position.y + direction * 2 <= 7 && !boardPieces[`${position.x}-${position.y + direction}`] && !boardPieces[`${position.x}-${position.y + direction * 2}`])
+      moves.push({ x: position.x, y: position.y + direction * 2 })
+    if (!hasMoved && direction < 0 && position.y + direction * 2 >= 0 && !boardPieces[`${position.x}-${position.y + direction}`] && !boardPieces[`${position.x}-${position.y + direction * 2}`])
+      moves.push({ x: position.x, y: position.y + direction * 2 })
+
+    if (boardPieces[`${position.x - 1}-${position.y + direction}`] && boardPieces[`${position.x - 1}-${position.y + direction}`].color !== color)
+      moves.push({ x: position.x - 1, y: position.y + direction })
+    if (boardPieces[`${position.x + 1}-${position.y + direction}`] && boardPieces[`${position.x + 1}-${position.y + direction}`].color !== color)
+      moves.push({ x: position.x + 1, y: position.y + direction })
 
     return moves
   }

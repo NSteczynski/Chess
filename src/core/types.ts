@@ -30,14 +30,12 @@ export interface PieceParams {
   type: PieceTypes
   /** The piece position. */
   position: Vector
-  /** If true then piece is destroyed. */
-  isDestroyed?: boolean
 }
 
 /** The pawn piece parameters. */
 export interface PawnParams extends PieceParams {
-  /** If true then piece can only move 1 position. */
-  movedFromStart: boolean
+  /** If true then piece has moved. */
+  hasMoved: boolean
 }
 
 /** The player color. */
