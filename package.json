@@ -1,0 +1,29 @@
+{
+  "name": "chess",
+  "version": "1.0.0",
+  "description": "Chess application.",
+  "author": "Norbert Steczyński",
+  "license": "MIT",
+  "scripts": {
+    "start": "webpack-dev-server --watch",
+    "build": "webpack --mode=production"
+  },
+  "dependencies": {
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+  },
+  "devDependencies": {
+    "@types/react": "^16.9.44",
+    "@types/react-dom": "^16.9.8",
+    "css-loader": "^3.6.0",
+    "html-webpack-plugin": "^4.3.0",
+    "node-sass": "^4.14.1",
+    "sass-loader": "^9.0.3",
+    "style-loader": "^1.2.1",
+    "ts-loader": "^8.0.2",
+    "typescript": "^3.9.7",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
+  }
+}

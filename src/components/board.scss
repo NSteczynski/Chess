@@ -1,0 +1,44 @@
+.board {
+  display: flex;
+  flex-direction: column;
+
+  & > .row {
+    display: flex;
+
+    & > .cell {
+      position: relative;
+      width: 100px;
+      height: 100px;
+
+      &.even { background: $even; }
+      &.odd { background: $odd; }
+      &.selected.even { background: $selectedEven; }
+      &.selected.odd { background: $selectedOdd; }
+      &.move:after {
+        content: "";
+        position: absolute;
+        top: 35%;
+        left: 35%;
+        z-index: 1;
+        width: 30%;
+        height: 30%;
+        border-radius: 100%;
+        background: $move;
+      }
+
+      & > .piece {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 5em;
+        -webkit-text-stroke: 3px $pieceOutline;
+        width: 100%;
+        height: 100%;
+
+        &:hover { cursor: pointer; }
+        &.black { color: $blackPiece; }
+        &.white { color: $whitePiece; }
+      }
+    }
+  }
+}
