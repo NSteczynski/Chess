@@ -39,8 +39,9 @@ const App: React.FunctionComponent<{}> = () => {
   }
 
   const onPieceClick = (position: Vector, color: PlayerColor, type: PieceTypes): void => {
+    if (color != settings.playerMove)
+      return undefined
     const moves = getPieceMoves(position, color, type)
-
     setSelectedPiece(boardPieces[`${position.x}-${position.y}`])
     setMoves(moves.reduce((r, move) => ({ ...r, [`${move.x}-${move.y}`]: true }), {}))
   }
@@ -61,6 +62,7 @@ const App: React.FunctionComponent<{}> = () => {
     setPieces(newPieces)
     setSelectedPiece(undefined)
     setMoves({})
+    setSettings({ ...settings, playerMove: settings.playerMove == PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE })
   }
 
   const onCellClick = (): void => {
