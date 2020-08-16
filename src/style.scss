@@ -1,6 +1,6 @@
 @import "./variables.scss";
-@import "./components/board.scss";
-@import "./components/piece.scss";
+@import "./reset.scss";
+@import "./components/components.scss";
 
 *, *:before, *:after {
   box-sizing: border-box;

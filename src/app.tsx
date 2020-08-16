@@ -1,4 +1,5 @@
 import React from "react"
+import Turn from "./components/turn"
 import Board from "./components/board"
 import DefaultSettings from "./core/settings"
 import { PlayerColor, Dictionary, Settings, PieceParams, PawnParams, PieceTypes, Vector } from "./core/types"
@@ -177,7 +178,19 @@ const App: React.FunctionComponent<{}> = () => {
     return moves
   }
 
-  return <Board pieces={boardPieces} moves={moves} selectedPiece={selectedPiece?.position} onPieceClick={onPieceClick} onMoveClick={onMoveClick} onCellClick={onCellClick} />
+  return (
+    <React.Fragment>
+      <Turn turn={settings.playerMove} />
+      <Board
+        pieces={boardPieces}
+        moves={moves}
+        selectedPiece={selectedPiece?.position}
+        onPieceClick={onPieceClick}
+        onMoveClick={onMoveClick}
+        onCellClick={onCellClick}
+      />
+    </React.Fragment>
+  )
 }
 
 export default App
