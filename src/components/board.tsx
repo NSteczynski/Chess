@@ -1,42 +1,27 @@
 import React from "react"
-import Piece from "./piece"
-import { Dictionary, PieceParams, Vector, PlayerColor, PieceTypes } from "../core/types"
+import Row from "./row"
+import { Dictionary, Vector, PieceParams } from "../core/types"
 
 const Board: React.FunctionComponent<{
   pieces: Dictionary<PieceParams>
-  moves: Dictionary<boolean>
-  selectedPiece: Vector | undefined
-  onPieceClick: (postion: Vector, color: PlayerColor, type: PieceTypes) => void
-  onMoveClick: (position: Vector) => void
-  onCellClick: () => void
-}> = ({ pieces, moves, selectedPiece, onPieceClick, onMoveClick, onCellClick }) => {
-  const board: Array<JSX.Element> = []
-
-  for (let y = 0; y < 8; ++y) {
-    const row: Array<JSX.Element> = []
-
-    for (let x = 0; x < 8; ++x) {
-      const piece = pieces[`${x}-${y}`]
-      const move = moves[`${x}-${y}`]
-      const className = "cell" + ((y + x) % 2 === 0 ? " even" : " odd") + (move ? " move" : "") + (selectedPiece && selectedPiece.x === x && selectedPiece.y === y ? " selected" : "")
-
-      row.push(
-        <div key={`cell-${x}`} className={className} onClick={() => move ? onMoveClick({ x, y }) : !piece && onCellClick()}>
-          {piece && <Piece {...piece} onClick={onPieceClick} />}
-        </div>
-      )
-    }
-
-    board.push(
-      <div key={`row-${y}`} className="row">
-        {row}
-      </div>
-    )
-  }
+  selectedPiecePosition: Vector | undefined
+  selectedPieceMoves: Dictionary<boolean>
+  onCellClick: (position: Vector) => void
+}> = ({ pieces, selectedPiecePosition, selectedPieceMoves, onCellClick }) => {
+  const rows = Array(8).fill(undefined).map((v, y) => (
+    <Row
+      key={y}
+      id={y}
+      pieces={pieces}
+      selectedPiecePosition={selectedPiecePosition}
+      selectedPieceMoves={selectedPieceMoves}
+      onCellClick={onCellClick}
+    />
+  ))
 
   return (
     <div className="board">
-      {board}
+      {rows}
     </div>
   )
 }

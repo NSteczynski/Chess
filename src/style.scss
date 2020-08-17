@@ -14,10 +14,13 @@ body {
   overflow: hidden;
   background: $background;
   transition: none;
+
   & > #app {
     display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    height: 100vh;
   }
 }

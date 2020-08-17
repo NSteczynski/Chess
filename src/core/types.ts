@@ -1,18 +1,27 @@
 /** The dictionary with string as key. */
 export type Dictionary<T> = { [name: string]: T }
 
-/** The dictionary with enum (string | number values) as key. */
-export type EnumDictionary<K extends string | symbol | number, T> = { [P in K]: T }
-
 /** The game settings. */
 export interface Settings {
   /** If true then game is started. */
-  isStarted: boolean
-  /** Determines which player move is. */
-  playerMove: PlayerColor
+  hasStarted: boolean
+  /** Determines which player starts the game. */
+  startPlayer: PlayerColor
 }
 
-/** The vector 2D. */
+/** The app state. */
+export interface AppState {
+  /** The player color that has current move. */
+  currentPlayerMove: PlayerColor
+  /** The array list of pieces. */
+  pieces: Array<PieceParams>
+  /** The current selected piece. */
+  selectedPiece: PieceParams | undefined
+  /** The selected piece available moves. */
+  selectedPieceMoves: Array<Vector>
+}
+
+/** The vector 2d. */
 export interface Vector {
   /** The parameter x. */
   x: number
@@ -22,8 +31,6 @@ export interface Vector {
 
 /** The piece parameters. */
 export interface PieceParams {
-  /** The piece id. */
-  id: number
   /** The piece color. */
   color: PlayerColor
   /** The piece type. */

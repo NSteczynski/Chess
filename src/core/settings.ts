@@ -1,8 +1,8 @@
 import { Settings, PlayerColor } from "./types"
 
 const DefaultSettings: Settings = {
-  isStarted: true,
-  playerMove: PlayerColor.WHITE
+  hasStarted: true,
+  startPlayer: PlayerColor.WHITE
 }
 
 export default DefaultSettings
