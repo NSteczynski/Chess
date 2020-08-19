@@ -4,7 +4,7 @@ import GameInformation from "./components/gameInformation"
 import DefaultSettings from "./core/settings"
 import DefaultAppState from "./core/appstate"
 import getPieceMoves from "./core/pieceMoves"
-import { Dictionary, Settings, AppState, Vector, PieceParams, PieceTypes, PlayerColor, MoveTypes, PieceMove } from "./core/types"
+import { Dictionary, Settings, AppState, Vector, PieceParams, PieceTypes, PlayerColor, MoveTypes } from "./core/types"
 
 const App: React.FunctionComponent<{}> = () => {
   const [settings, setSettings] = React.useState<Settings>(DefaultSettings)
@@ -30,15 +30,15 @@ const App: React.FunctionComponent<{}> = () => {
     const pawnY  = switchRows ? offsetY + 1 : offsetY
     const pieceY = switchRows ? offsetY     : offsetY + 1
 
-    // for (let i = 0; i < 8; ++i)
-    //   pieces.push({ color, type: PieceTypes.PAWN, position: { x: i, y: pawnY  }})
+    for (let i = 0; i < 8; ++i)
+      pieces.push({ color, type: PieceTypes.PAWN, position: { x: i, y: pawnY  }})
     pieces.push({ color, type: PieceTypes.ROOK  , position: { x: 0, y: pieceY }})
-    // pieces.push({ color, type: PieceTypes.KNIGHT, position: { x: 1, y: pieceY }})
-    // pieces.push({ color, type: PieceTypes.BISHOP, position: { x: 2, y: pieceY }})
-    // pieces.push({ color, type: PieceTypes.QUEEN , position: { x: 3, y: pieceY }})
+    pieces.push({ color, type: PieceTypes.KNIGHT, position: { x: 1, y: pieceY }})
+    pieces.push({ color, type: PieceTypes.BISHOP, position: { x: 2, y: pieceY }})
+    pieces.push({ color, type: PieceTypes.QUEEN , position: { x: 3, y: pieceY }})
     pieces.push({ color, type: PieceTypes.KING  , position: { x: 4, y: pieceY }})
-    // pieces.push({ color, type: PieceTypes.BISHOP, position: { x: 5, y: pieceY }})
-    // pieces.push({ color, type: PieceTypes.KNIGHT, position: { x: 6, y: pieceY }})
+    pieces.push({ color, type: PieceTypes.BISHOP, position: { x: 5, y: pieceY }})
+    pieces.push({ color, type: PieceTypes.KNIGHT, position: { x: 6, y: pieceY }})
     pieces.push({ color, type: PieceTypes.ROOK  , position: { x: 7, y: pieceY }})
 
     return pieces

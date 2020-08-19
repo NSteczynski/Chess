@@ -94,10 +94,12 @@ const getKingMoves = (position: Vector, color: PlayerColor, pieces: Dictionary<P
   const kSideCastlingPosition = { x: 6, y: position.y }
   const canQSideCastling = !checkAttack && !hasKingMoved && !isKingUnderAttack && qSideRook && !qSideRook.hasMoved &&
                            !isPositionAttacked({ x: 2, y: position.y }, oppositeColor, pieces) &&
-                           !isPositionAttacked({ x: 3, y: position.y }, oppositeColor, pieces)
+                           !isPositionAttacked({ x: 3, y: position.y }, oppositeColor, pieces) &&
+                           !pieces[`1-${position.y}`] && !pieces[`2-${position.y}`] && !pieces[`3-${position.y}`]
   const canKSideCastling = !checkAttack && !hasKingMoved && !isKingUnderAttack && kSideRook && !kSideRook.hasMoved &&
                            !isPositionAttacked({ x: 5, y: position.y }, oppositeColor, pieces) &&
-                           !isPositionAttacked({ x: 6, y: position.y }, oppositeColor, pieces)
+                           !isPositionAttacked({ x: 6, y: position.y }, oppositeColor, pieces) &&
+                           !pieces[`5-${position.y}`] && !pieces[`6-${position.y}`]
 
   return [
     canQSideCastling && { position: qSideCastlingPosition, type: MoveTypes.Q_CASTLING },
@@ -148,7 +150,7 @@ const getLineMoves = (position: Vector, color: PlayerColor, changeX: number, cha
     const movePosition = { x: position.x + i * changeX, y: position.y + i * changeY }
     const moveType = currentPiece ? MoveTypes.CAPTURE : MoveTypes.MOVE
 
-    if (!checkAttack && (currentPiece?.color === color || prevPiece && prevPiece.color !== color)) break
+    if (!checkAttack && currentPiece?.color === color || prevPiece && prevPiece.color !== color) break
     moves.push({ position: movePosition, type: moveType })
   }
 
