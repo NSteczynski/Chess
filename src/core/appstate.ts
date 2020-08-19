@@ -5,7 +5,8 @@ const DefaultAppState: AppState = {
   currentPlayerMove: DefaultSettings.startPlayer,
   pieces: [],
   selectedPiece: undefined,
-  selectedPieceMoves: []
+  selectedPieceMoves: [],
+  movesHistory: []
 }
 
 export default DefaultAppState

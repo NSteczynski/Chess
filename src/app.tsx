@@ -1,16 +1,18 @@
 import React from "react"
 import Board from "./components/board"
+import GameInformation from "./components/gameInformation"
 import DefaultSettings from "./core/settings"
 import DefaultAppState from "./core/appstate"
 import getPieceMoves from "./core/pieceMoves"
-import { Dictionary, Settings, AppState, Vector, PieceParams, PieceTypes, PlayerColor } from "./core/types"
+import { Dictionary, Settings, AppState, Vector, PieceParams, PieceTypes, PlayerColor, MoveTypes, MoveHistory } from "./core/types"
 
 const App: React.FunctionComponent<{}> = () => {
   const [settings, setSettings] = React.useState<Settings>(DefaultSettings)
   const [state, setState] = React.useState<AppState>(DefaultAppState)
 
-  const pieces: Dictionary<PieceParams> = state.pieces.reduce((r, piece): Dictionary<PieceParams> => ({ ...r, [`${piece.position.x}-${piece.position.y}`]: piece }), {})
+  const pieces: Dictionary<PieceParams> = state.pieces.reduce((r, piece) => ({ ...r, [`${piece.position.x}-${piece.position.y}`]: piece }), {})
   const selectedPieceMoves: Dictionary<boolean> = state.selectedPieceMoves.reduce((r, move) => ({ ...r, [`${move.x}-${move.y}`]: true }), {})
+  const lastMove = state.movesHistory[state.movesHistory.length - 1]
 
   React.useEffect(() => {
     if (!settings.hasStarted)
@@ -77,16 +79,31 @@ const App: React.FunctionComponent<{}> = () => {
       return { ...piece, position }
     }).filter(piece => !currentPiece || piece != currentPiece)
 
-    return setState(prevState => ({ ...prevState, currentPlayerMove: nextPlayerMove, pieces: newPieces, selectedPiece: undefined, selectedPieceMoves: [] }))
+    const newMovesHistory = [...state.movesHistory]
+    const moveType = currentPiece ? MoveTypes.CAPTURE : MoveTypes.MOVE
+    newMovesHistory.push({ newPosition: position, piece: state.selectedPiece, capturedPiece: currentPiece, type: moveType })
+
+    return setState(prevState => ({
+      ...prevState,
+      currentPlayerMove: nextPlayerMove,
+      pieces: newPieces,
+      selectedPiece: undefined,
+      selectedPieceMoves: [],
+      movesHistory: newMovesHistory
+    }))
   }
 
   return (
     <React.Fragment>
       <Board
         pieces={pieces}
+        lastMove={lastMove}
         selectedPiecePosition={state.selectedPiece?.position}
         selectedPieceMoves={selectedPieceMoves}
         onCellClick={onCellClick}
+      />
+      <GameInformation
+        movesHistory={state.movesHistory}
       />
     </React.Fragment>
   )

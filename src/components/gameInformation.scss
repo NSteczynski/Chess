@@ -1,0 +1,36 @@
+.gameInformation {
+  width: 350px;
+  height: 800px;
+  margin-left: 25px;
+  background: $container;
+
+  & > .movesHistory {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    counter-reset: line;
+
+    & > span {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      padding: 5px 0px;
+      width: 50%;
+      color: $text;
+      font-size: 18px;
+
+      &:nth-child(4n + 3), &:nth-child(4n + 4) { background: $lightContainer; }
+      &:nth-child(2n + 1) {
+        counter-increment: line;
+
+        &:before {
+          content: counter(line)".";
+          position: absolute;
+          top: 0px;
+          left: 0px;
+          padding: 5px 10px;
+        }
+      }
+    }
+  }
+}

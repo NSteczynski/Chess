@@ -19,14 +19,28 @@ export interface AppState {
   selectedPiece: PieceParams | undefined
   /** The selected piece available moves. */
   selectedPieceMoves: Array<Vector>
+  /** The history of moves. */
+  movesHistory: Array<MoveHistory>
 }
 
-/** The vector 2d. */
+/** The vector 2D. */
 export interface Vector {
   /** The parameter x. */
   x: number
   /** The parameter y. */
   y: number
+}
+
+/** The move history. */
+export interface MoveHistory {
+  /** The new position. */
+  newPosition: Vector
+  /** The moved piece. */
+  piece: PieceParams
+  /** The captured piece. */
+  capturedPiece: PieceParams | undefined
+  /** The move type. */
+  type: MoveTypes
 }
 
 /** The piece parameters. */
@@ -51,11 +65,28 @@ export enum PlayerColor {
   BLACK = "black"
 }
 
+/** The piece types. */
 export enum PieceTypes {
-  PAWN = "pawn",
+  PAWN   = "pawn",
   KNIGHT = "knight",
   BISHOP = "bishop",
-  ROOK = "rook",
-  QUEEN = "queen",
-  KING = "king"
+  ROOK   = "rook",
+  QUEEN  = "queen",
+  KING   = "king"
+}
+
+/** The moves types. */
+export enum MoveTypes {
+  MOVE    = "",
+  CAPTURE = "x"
+}
+
+/** The piece type algebraic notation name. */
+export enum PieceNotationName {
+  PAWN   = "",
+  KNIGHT = "N",
+  BISHOP = "B",
+  ROOK   = "R",
+  QUEEN  = "Q",
+  KING   = "K",
 }

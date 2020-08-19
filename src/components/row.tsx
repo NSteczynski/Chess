@@ -1,17 +1,21 @@
 import React from "react"
-import { Dictionary, Vector, PieceParams } from "../core/types"
+import { Dictionary, Vector, PieceParams, MoveHistory } from "../core/types"
 
 const Row: React.FunctionComponent<{
   id: number
   pieces: Dictionary<PieceParams>
+  lastMove: MoveHistory | undefined
   selectedPiecePosition: Vector | undefined
   selectedPieceMoves: Dictionary<boolean>
   onCellClick: (position: Vector) => void
-}> = ({ id, pieces, selectedPiecePosition, selectedPieceMoves, onCellClick }) => {
+}> = ({ id, pieces, lastMove, selectedPiecePosition, selectedPieceMoves, onCellClick }) => {
   const cells = Array(8).fill(undefined).map((v, x) => {
     const currentPiece = pieces[`${x}-${id}`]
     const currentMove = selectedPieceMoves[`${x}-${id}`]
-    const isSelected = { x, y: id } == selectedPiecePosition
+    const isSelected = selectedPiecePosition &&
+                       x == selectedPiecePosition.x   && id == selectedPiecePosition.y  || lastMove && (
+                       x == lastMove.newPosition.x    && id == lastMove.newPosition.y   ||
+                       x == lastMove.piece.position.x && id == lastMove.piece.position.y)
     const type = (id + x) % 2 == 0 ? " even" : " odd"
     const className = "cell" + type + (currentMove ? " move" : "") + (isSelected ? " selected" : "")
 
