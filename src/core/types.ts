@@ -18,7 +18,7 @@ export interface AppState {
   /** The current selected piece. */
   selectedPiece: PieceParams | undefined
   /** The selected piece available moves. */
-  selectedPieceMoves: Array<Vector>
+  selectedPieceMoves: Array<PieceMove>
   /** The history of moves. */
   movesHistory: Array<MoveHistory>
 }
@@ -41,6 +41,8 @@ export interface MoveHistory {
   capturedPiece: PieceParams | undefined
   /** The move type. */
   type: MoveTypes
+  /** Returns true if move is check. */
+  isCheck: boolean
 }
 
 /** The piece parameters. */
@@ -51,12 +53,16 @@ export interface PieceParams {
   type: PieceTypes
   /** The piece position. */
   position: Vector
+  /** Returns true if piece has moves. */
+  hasMoved?: boolean
 }
 
-/** The pawn piece parameters. */
-export interface PawnParams extends PieceParams {
-  /** If true then piece has moved. */
-  hasMoved: boolean
+/** The piece move. */
+export interface PieceMove {
+  /** The move position. */
+  position: Vector
+  /** The move type. */
+  type: MoveTypes
 }
 
 /** The player color. */
@@ -77,8 +83,10 @@ export enum PieceTypes {
 
 /** The moves types. */
 export enum MoveTypes {
-  MOVE    = "",
-  CAPTURE = "x"
+  MOVE       = "",
+  CAPTURE    = "x",
+  K_CASTLING = "0-0",
+  Q_CASTLING = "0-0-0"
 }
 
 /** The piece type algebraic notation name. */
