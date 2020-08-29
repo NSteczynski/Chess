@@ -1,12 +1,12 @@
 import React from "react"
 import MovesHistory from "./movesHistory"
-import { MoveHistory } from "../core/types"
+import { Dictionary, HistoryMove } from "../core/types"
 
 const GameInformation: React.FunctionComponent<{
-  movesHistory: Array<MoveHistory>
-}> = ({ movesHistory }) => (
+  historyMoves: Dictionary<HistoryMove>
+}> = ({ historyMoves }) => (
   <div className="gameInformation">
-    <MovesHistory moves={movesHistory} />
+    <MovesHistory moves={historyMoves} />
   </div>
 )
 

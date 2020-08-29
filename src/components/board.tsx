@@ -1,22 +1,22 @@
 import React from "react"
 import Row from "./row"
-import { Dictionary, Vector, PieceParams, MoveHistory, MoveTypes } from "../core/types"
+import { Dictionary, Vector, Piece, HistoryMove, PieceMove } from "../core/types"
 
 const Board: React.FunctionComponent<{
-  pieces: Dictionary<PieceParams>
-  lastMove: MoveHistory | undefined
-  selectedPiecePosition: Vector | undefined
-  selectedPieceMoves: Dictionary<MoveTypes>
+  pieces: Dictionary<Piece>
+  selectedPosition: Vector | undefined
+  selectedMoves: Dictionary<PieceMove>
+  lastMove: HistoryMove | undefined
   onCellClick: (position: Vector) => void
-}> = ({ pieces, lastMove, selectedPiecePosition, selectedPieceMoves, onCellClick }) => {
+}> = ({ pieces, selectedPosition, selectedMoves, lastMove, onCellClick }) => {
   const rows = Array(8).fill(undefined).map((v, y) => (
     <Row
       key={y}
       id={y}
       pieces={pieces}
+      selectedPosition={selectedPosition}
+      selectedMoves={selectedMoves}
       lastMove={lastMove}
-      selectedPiecePosition={selectedPiecePosition}
-      selectedPieceMoves={selectedPieceMoves}
       onCellClick={onCellClick}
     />
   ))

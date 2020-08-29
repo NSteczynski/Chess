@@ -1,170 +1,177 @@
-import { Dictionary, Vector, PieceParams, PieceTypes, PlayerColor, PieceMove, MoveTypes } from "./types"
+import { Dictionary, Vector, Piece, PieceMove, PlayerColor, PieceTypes, MoveTypes } from "./types"
+import { getPositionName } from "./functions"
 
 /**
  * Returns available moves for piece type.
- * @param position The piece position.
- * @param color The player color.
- * @param type The piece type.
- * @param pieces The piece list.
+ * @param piece The piece.
+ * @param pieces The list of pieces.
  * @param checkAttack If true then checks piece posible attack moves. Default: false.
  */
-const getPieceMoves = (position: Vector, color: PlayerColor, type: PieceTypes, pieces: Dictionary<PieceParams>, checkAttack: boolean = false): Array<PieceMove> => {
-  switch (type) {
+const getPieceMoves = (piece: Piece, pieces: Dictionary<Piece>, checkAttack: boolean = false): Dictionary<PieceMove> => {
+  switch (piece.type) {
     case PieceTypes.PAWN:
-      return getPawnMoves(position, color, pieces, checkAttack)
+      return getPawnMoves(piece, pieces, checkAttack)
     case PieceTypes.ROOK:
-      return getRookMoves(position, color, pieces, checkAttack)
+      return getRookMoves(piece, pieces, checkAttack)
     case PieceTypes.KNIGHT:
-      return getKnightMoves(position, color, pieces, checkAttack)
+      return getKnightMoves(piece, pieces, checkAttack)
     case PieceTypes.BISHOP:
-      return getBishopMoves(position, color, pieces, checkAttack)
+      return getBishopMoves(piece, pieces, checkAttack)
     case PieceTypes.QUEEN:
-      return getQueenMoves(position, color, pieces, checkAttack)
+      return getQueenMoves(piece, pieces, checkAttack)
     case PieceTypes.KING:
-      return getKingMoves(position, color, pieces, checkAttack)
+      return getKingMoves(piece, pieces, checkAttack)
     default:
-      return []
+      return {}
   }
 }
 
-const getPawnMoves = (position: Vector, color: PlayerColor, pieces: Dictionary<PieceParams>, checkAttack: boolean): Array<PieceMove> => {
-  const direction = color === PlayerColor.WHITE ? -1 : 1
-  const hasMoved = pieces[`${position.x}-${position.y}`]?.hasMoved
+const getPawnMoves = (piece: Piece, pieces: Dictionary<Piece>, checkAttack: boolean): Dictionary<PieceMove> => {
+  const direction = piece.color === PlayerColor.WHITE ? -1 : 1
 
-  const canMoveLeft   =  pieces[`${position.x - 1}-${position.y + direction    }`] ||  checkAttack
-  const canMoveRight  =  pieces[`${position.x + 1}-${position.y + direction    }`] ||  checkAttack
-  const canSingleMove = !pieces[`${position.x    }-${position.y + direction    }`] && !checkAttack
-  const canDoubleMove = !pieces[`${position.x    }-${position.y + direction * 2}`] && !hasMoved && canSingleMove
+  const left   = { x: piece.position.x - 1, y: piece.position.y + direction     }
+  const right  = { x: piece.position.x + 1, y: piece.position.y + direction     }
+  const single = { x: piece.position.x    , y: piece.position.y + direction     }
+  const double = { x: piece.position.x    , y: piece.position.y + direction * 2 }
 
-  return [
-    canMoveLeft   && getSingleMove(position, color, -1, direction    , pieces, checkAttack),
-    canMoveRight  && getSingleMove(position, color,  1, direction    , pieces, checkAttack),
-    canSingleMove && getSingleMove(position, color,  0, direction    , pieces, checkAttack),
-    canDoubleMove && getSingleMove(position, color,  0, direction * 2, pieces, checkAttack)
-  ].filter(move => move) as Array<PieceMove>
-}
-
-const getKnightMoves = (position: Vector, color: PlayerColor, pieces: Dictionary<PieceParams>, checkAttack: boolean): Array<PieceMove> => {
-    return [
-    getSingleMove(position, color, -1,  2, pieces, checkAttack),
-    getSingleMove(position, color,  1,  2, pieces, checkAttack),
-    getSingleMove(position, color,  2,  1, pieces, checkAttack),
-    getSingleMove(position, color,  2, -1, pieces, checkAttack),
-    getSingleMove(position, color, -1, -2, pieces, checkAttack),
-    getSingleMove(position, color,  1, -2, pieces, checkAttack),
-    getSingleMove(position, color, -2,  1, pieces, checkAttack),
-    getSingleMove(position, color, -2, -1, pieces, checkAttack),
-  ].filter(move => move) as Array<PieceMove>
-}
-
-const getRookMoves = (position: Vector, color: PlayerColor, pieces: Dictionary<PieceParams>, checkAttack: boolean): Array<PieceMove> => {
-  return [
-    ...getLineMoves(position, color,  0, -1, pieces, checkAttack),
-    ...getLineMoves(position, color,  1,  0, pieces, checkAttack),
-    ...getLineMoves(position, color,  0,  1, pieces, checkAttack),
-    ...getLineMoves(position, color, -1,  0, pieces, checkAttack)
-  ]
-}
-
-const getBishopMoves = (position: Vector, color: PlayerColor, pieces: Dictionary<PieceParams>, checkAttack: boolean): Array<PieceMove> => {
-  return [
-    ...getLineMoves(position, color, -1, -1, pieces, checkAttack),
-    ...getLineMoves(position, color,  1, -1, pieces, checkAttack),
-    ...getLineMoves(position, color,  1,  1, pieces, checkAttack),
-    ...getLineMoves(position, color, -1,  1, pieces, checkAttack)
-  ]
-}
-
-const getQueenMoves = (position: Vector, color: PlayerColor, pieces: Dictionary<PieceParams>, checkAttack: boolean): Array<PieceMove> => {
-  return [
-    ...getRookMoves(position, color, pieces, checkAttack),
-    ...getBishopMoves(position, color, pieces, checkAttack)
-  ]
-}
-
-const getKingMoves = (position: Vector, color: PlayerColor, pieces: Dictionary<PieceParams>, checkAttack: boolean): Array<PieceMove> => {
-  const oppositeColor = color === PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE
-  const hasKingMoved = pieces[`${position.x}-${position.y}`]?.hasMoved
-  const isKingUnderAttack = !checkAttack && isPositionAttacked(position, oppositeColor, pieces)
-  const qSideRookKey = Object.keys(pieces).find(key => pieces[key].color === color && pieces[key].type === PieceTypes.ROOK && pieces[key].position.x === 0)
-  const kSideRookKey = Object.keys(pieces).find(key => pieces[key].color === color && pieces[key].type === PieceTypes.ROOK && pieces[key].position.x === 7)
-  const qSideRook = qSideRookKey && pieces[qSideRookKey]
-  const kSideRook = kSideRookKey && pieces[kSideRookKey]
-  const qSideCastlingPosition = { x: 2, y: position.y }
-  const kSideCastlingPosition = { x: 6, y: position.y }
-  const canQSideCastling = !checkAttack && !hasKingMoved && !isKingUnderAttack && qSideRook && !qSideRook.hasMoved &&
-                           !isPositionAttacked({ x: 2, y: position.y }, oppositeColor, pieces) &&
-                           !isPositionAttacked({ x: 3, y: position.y }, oppositeColor, pieces) &&
-                           !pieces[`1-${position.y}`] && !pieces[`2-${position.y}`] && !pieces[`3-${position.y}`]
-  const canKSideCastling = !checkAttack && !hasKingMoved && !isKingUnderAttack && kSideRook && !kSideRook.hasMoved &&
-                           !isPositionAttacked({ x: 5, y: position.y }, oppositeColor, pieces) &&
-                           !isPositionAttacked({ x: 6, y: position.y }, oppositeColor, pieces) &&
-                           !pieces[`5-${position.y}`] && !pieces[`6-${position.y}`]
+  const canMoveLeft   = pieces[getPositionName(left  )] != undefined ||  checkAttack
+  const canMoveRight  = pieces[getPositionName(right )] != undefined ||  checkAttack
+  const canMoveSingle = pieces[getPositionName(single)] == undefined && !checkAttack
+  const canMoveDouble = pieces[getPositionName(double)] == undefined && canMoveSingle && !piece.hasMoved
 
   return [
-    canQSideCastling && { position: qSideCastlingPosition, type: MoveTypes.Q_CASTLING },
-    canKSideCastling && { position: kSideCastlingPosition, type: MoveTypes.K_CASTLING },
-
-    getSingleMove(position, color, -1, -1, pieces, checkAttack),
-    getSingleMove(position, color,  1, -1, pieces, checkAttack),
-    getSingleMove(position, color,  1,  1, pieces, checkAttack),
-    getSingleMove(position, color, -1,  1, pieces, checkAttack),
-
-    getSingleMove(position, color,  0, -1, pieces, checkAttack),
-    getSingleMove(position, color, -1,  0, pieces, checkAttack),
-    getSingleMove(position, color,  0,  1, pieces, checkAttack),
-    getSingleMove(position, color,  1,  0, pieces, checkAttack),
-  ].filter(move => {
-    if (!move)
-      return false
-    if (checkAttack)
-      return true
-    return !isPositionAttacked(move.position, oppositeColor, pieces)
-  }) as Array<PieceMove>
+    canMoveLeft   ? getSingleMove(piece, left  , pieces, checkAttack) : undefined,
+    canMoveRight  ? getSingleMove(piece, right , pieces, checkAttack) : undefined,
+    canMoveSingle ? getSingleMove(piece, single, pieces, checkAttack) : undefined,
+    canMoveDouble ? getSingleMove(piece, double, pieces, checkAttack) : undefined
+  ].reduce((r, move): Dictionary<PieceMove> => {
+    if (move == undefined)
+      return r
+    return { ...r, [getPositionName(move.position)]: move }
+  }, {})
 }
 
-const getSingleMove = (position: Vector, color: PlayerColor, changeX: number, changeY: number, pieces: Dictionary<PieceParams>, checkAttack: boolean): PieceMove | undefined => {
-  const canMoveX = changeX > 0 ? 7 - position.x - changeX >= 0 : changeX < 0 ? position.x + changeX >= 0 : true
-  const canMoveY = changeY > 0 ? 7 - position.y - changeY >= 0 : changeY < 0 ? position.y + changeY >= 0 : true
+const getKnightMoves = (piece: Piece, pieces: Dictionary<Piece>, checkAttack: boolean): Dictionary<PieceMove> => {
+  return [
+    getSingleMove(piece, { x: piece.position.x - 1, y: piece.position.y + 2 }, pieces, checkAttack),
+    getSingleMove(piece, { x: piece.position.x + 1, y: piece.position.y + 2 }, pieces, checkAttack),
+    getSingleMove(piece, { x: piece.position.x + 2, y: piece.position.y + 1 }, pieces, checkAttack),
+    getSingleMove(piece, { x: piece.position.x + 2, y: piece.position.y - 1 }, pieces, checkAttack),
+    getSingleMove(piece, { x: piece.position.x - 1, y: piece.position.y - 2 }, pieces, checkAttack),
+    getSingleMove(piece, { x: piece.position.x + 1, y: piece.position.y - 2 }, pieces, checkAttack),
+    getSingleMove(piece, { x: piece.position.x - 2, y: piece.position.y + 1 }, pieces, checkAttack),
+    getSingleMove(piece, { x: piece.position.x - 2, y: piece.position.y - 1 }, pieces, checkAttack),
+  ].reduce((r, move): Dictionary<PieceMove> => {
+    if (move == undefined)
+      return r
+    return { ...r, [getPositionName(move.position)]: move }
+  }, {})
+}
 
-  const currentPiece = pieces[`${position.x + changeX}-${position.y + changeY}`]
-  const movePosition = { x: position.x + changeX, y: position.y + changeY }
-  const moveType = currentPiece ? MoveTypes.CAPTURE : MoveTypes.MOVE
+const getRookMoves = (piece: Piece, pieces: Dictionary<Piece>, checkAttack: boolean): Dictionary<PieceMove> => {
+  return {
+    ...getLineMoves(piece,  0, -1, pieces, checkAttack),
+    ...getLineMoves(piece,  1,  0, pieces, checkAttack),
+    ...getLineMoves(piece,  0,  1, pieces, checkAttack),
+    ...getLineMoves(piece, -1,  0, pieces, checkAttack)
+  }
+}
 
-  if (!canMoveX || !canMoveY || !checkAttack && currentPiece?.color === color)
+const getBishopMoves = (piece: Piece, pieces: Dictionary<Piece>, checkAttack: boolean): Dictionary<PieceMove> => {
+  return {
+    ...getLineMoves(piece, -1, -1, pieces, checkAttack),
+    ...getLineMoves(piece,  1, -1, pieces, checkAttack),
+    ...getLineMoves(piece,  1,  1, pieces, checkAttack),
+    ...getLineMoves(piece, -1,  1, pieces, checkAttack)
+  }
+}
+
+const getQueenMoves = (piece: Piece, pieces: Dictionary<Piece>, checkAttack: boolean): Dictionary<PieceMove> => {
+  return {
+    ...getRookMoves(piece, pieces, checkAttack),
+    ...getBishopMoves(piece, pieces, checkAttack)
+  }
+}
+
+const getKingMoves = (piece: Piece, pieces: Dictionary<Piece>, checkAttack: boolean): Dictionary<PieceMove> => {
+  const moves: Dictionary<PieceMove> = {}
+  const oppositeColor = piece.color === PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE
+  const isKingSafe = !checkAttack && !isPositionAttacked(piece.position, oppositeColor, pieces)
+  const qSideCastlingPosition = { x: 2, y: piece.position.y }
+  const kSideCastlingPosition = { x: 6, y: piece.position.y }
+  const qSideRook = pieces[getPositionName({ x: 0, y: piece.position.y })]
+  const kSideRook = pieces[getPositionName({ x: 7, y: piece.position.y })]
+  const isQLineClear = pieces[getPositionName({ x: 1, y: piece.position.y })] == undefined && pieces[getPositionName({ x: 2, y: piece.position.y })] == undefined && pieces[getPositionName({ x: 3, y: piece.position.y })] == undefined
+  const isKLineClear = pieces[getPositionName({ x: 5, y: piece.position.y })] == undefined && pieces[getPositionName({ x: 6, y: piece.position.y })] == undefined
+  const canKingMoveQ = isKingSafe && !isPositionAttacked({ x: 2, y: piece.position.y }, oppositeColor, pieces) && !isPositionAttacked({ x: 3, y: piece.position.y }, oppositeColor, pieces)
+  const canKingMoveK = isKingSafe && !isPositionAttacked({ x: 5, y: piece.position.y }, oppositeColor, pieces) && !isPositionAttacked({ x: 6, y: piece.position.y }, oppositeColor, pieces)
+  if (!piece.hasMoved && qSideRook && !qSideRook.hasMoved && isQLineClear && canKingMoveQ)
+    moves[getPositionName(qSideCastlingPosition)] = { position: qSideCastlingPosition, type: MoveTypes.Q_CASTLING }
+  if (!piece.hasMoved && kSideRook && !kSideRook.hasMoved && isKLineClear && canKingMoveK)
+    moves[getPositionName(kSideCastlingPosition)] = { position: kSideCastlingPosition, type: MoveTypes.K_CASTLING }
+
+  return [
+    getSingleMove(piece, { x: piece.position.x - 1, y: piece.position.y - 1 }, pieces, checkAttack),
+    getSingleMove(piece, { x: piece.position.x + 1, y: piece.position.y - 1 }, pieces, checkAttack),
+    getSingleMove(piece, { x: piece.position.x + 1, y: piece.position.y + 1 }, pieces, checkAttack),
+    getSingleMove(piece, { x: piece.position.x - 1, y: piece.position.y + 1 }, pieces, checkAttack),
+
+    getSingleMove(piece, { x: piece.position.x    , y: piece.position.y - 1 }, pieces, checkAttack),
+    getSingleMove(piece, { x: piece.position.x - 1, y: piece.position.y     }, pieces, checkAttack),
+    getSingleMove(piece, { x: piece.position.x    , y: piece.position.y + 1 }, pieces, checkAttack),
+    getSingleMove(piece, { x: piece.position.x + 1, y: piece.position.y     }, pieces, checkAttack)
+  ].reduce((r, move): Dictionary<PieceMove> => {
+    if (move == undefined || !checkAttack && isPositionAttacked(move.position, oppositeColor, pieces))
+      return r
+    return { ...r, [getPositionName(move.position)]: move }
+  }, moves)
+}
+
+const getSingleMove = (piece: Piece, newPosition: Vector, pieces: Dictionary<Piece>, checkAttack: boolean): PieceMove | undefined => {
+  const canMoveX = newPosition.x <= 7 && newPosition.x >= 0
+  const canMoveY = newPosition.y <= 7 && newPosition.y >= 0
+  const newPiece = pieces[getPositionName(newPosition)]
+  const moveType = newPiece ? MoveTypes.CAPTURE : MoveTypes.MOVE
+
+  if (!canMoveX || !canMoveY || !checkAttack && newPiece && newPiece.color === piece.color)
     return undefined
-  return { position: movePosition, type: moveType }
+  return { position: newPosition, type: moveType }
 }
 
-const getLineMoves = (position: Vector, color: PlayerColor, changeX: number, changeY: number, pieces: Dictionary<PieceParams>, checkAttack: boolean): Array<PieceMove> => {
-  const moves: Array<PieceMove> = []
-  const numberOfMovesX = changeX > 0 ? 7 - position.x : changeX < 0 ? position.x : undefined
-  const numberOfMovesY = changeY > 0 ? 7 - position.y : changeY < 0 ? position.y : undefined
+const getLineMoves = (piece: Piece, changeX: number, changeY: number, pieces: Dictionary<Piece>, checkAttack: boolean): Dictionary<PieceMove> => {
+  const moves: Dictionary<PieceMove> = {}
+  const numberOfMovesX = changeX > 0 ? 7 - piece.position.x : changeX < 0 ? piece.position.x : undefined
+  const numberOfMovesY = changeY > 0 ? 7 - piece.position.y : changeY < 0 ? piece.position.y : undefined
   const numberOfMoves = numberOfMovesX == undefined ? numberOfMovesY : numberOfMovesY == undefined ? numberOfMovesX : numberOfMovesX < numberOfMovesY ? numberOfMovesX : numberOfMovesY
   if (!numberOfMoves)
     return moves
 
   for (let i = 1; i <= numberOfMoves; ++i) {
-    const currentPiece = pieces[`${position.x + i * changeX}-${position.y + i * changeY}`]
-    const prevPiece = pieces[`${position.x + (i - 1) * changeX}-${position.y + (i - 1) * changeY}`]
-    const movePosition = { x: position.x + i * changeX, y: position.y + i * changeY }
-    const moveType = currentPiece ? MoveTypes.CAPTURE : MoveTypes.MOVE
+    const currPosition = { x: piece.position.x + i       * changeX, y: piece.position.y + i       * changeY }
+    const prevPosition = { x: piece.position.x + (i - 1) * changeX, y: piece.position.y + (i - 1) * changeY }
+    const currPiece = pieces[getPositionName(currPosition)]
+    const prevPiece = pieces[getPositionName(prevPosition)]
+    const moveType  = currPiece ? MoveTypes.CAPTURE : MoveTypes.MOVE
 
-    if (!checkAttack && currentPiece?.color === color || prevPiece && prevPiece.color !== color) break
-    moves.push({ position: movePosition, type: moveType })
+    if (!checkAttack && currPiece?.color === piece.color || prevPiece && prevPiece.color !== piece.color) break
+    moves[getPositionName(currPosition)] = { position: currPosition, type: moveType }
   }
 
   return moves
 }
 
-export const isPositionAttacked = (position: Vector, color: PlayerColor, pieces: Dictionary<PieceParams>): boolean => {
+/**
+ * Returns true if position is attacked by provided color.
+ * @param position The position to be checked.
+ * @param color The color that attack.
+ * @pieces The list of pieces.
+ */
+export const isPositionAttacked = (position: Vector, color: PlayerColor, pieces: Dictionary<Piece>): boolean => {
   return !!Object.keys(pieces).find(key => {
-    const piece = pieces[key]
-    if (piece.color !== color)
+    const current = pieces[key]
+    if (current.color !== color)
       return false
-
-    const pieceMoves = getPieceMoves(piece.position, piece.color, piece.type, pieces, true)
-    return pieceMoves.find(move => move.position.x === position.x && move.position.y === position.y)
+    return getPieceMoves(current, pieces, true)[getPositionName(position)]
   })
 }
 

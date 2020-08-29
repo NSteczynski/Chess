@@ -4,15 +4,12 @@ import GameInformation from "./components/gameInformation"
 import DefaultSettings from "./core/settings"
 import DefaultAppState from "./core/appstate"
 import getPieceMoves from "./core/pieceMoves"
-import { Dictionary, Settings, AppState, Vector, PieceParams, PieceTypes, PlayerColor, MoveTypes } from "./core/types"
+import { getPositionName } from "./core/functions"
+import { Dictionary, Vector, Settings, AppState, Piece, PlayerColor, PieceTypes, PieceMove, MoveTypes } from "./core/types"
 
 const App: React.FunctionComponent<{}> = () => {
   const [settings, setSettings] = React.useState<Settings>(DefaultSettings)
   const [state, setState] = React.useState<AppState>(DefaultAppState)
-
-  const pieces: Dictionary<PieceParams> = state.pieces.reduce((r, piece) => ({ ...r, [`${piece.position.x}-${piece.position.y}`]: piece }), {})
-  const selectedPieceMoves: Dictionary<MoveTypes> = state.selectedPieceMoves.reduce((r, move) => ({ ...r, [`${move.position.x}-${move.position.y}`]: move.type }), {})
-  const lastMove = state.movesHistory[state.movesHistory.length - 1]
 
   React.useEffect(() => {
     if (!settings.hasStarted)
@@ -21,97 +18,87 @@ const App: React.FunctionComponent<{}> = () => {
     const secondPlayerColor = settings.startPlayer === PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE
     const firstPlayer = createPlayerPieces(settings.startPlayer, 6, false)
     const secondPlayer = createPlayerPieces(secondPlayerColor, 0, true)
-
-    return setState(prevState => ({ ...prevState, pieces: [...firstPlayer, ...secondPlayer], currentPlayerMove: settings.startPlayer }))
+    return setState(prevState => ({ ...prevState, pieces: { ...firstPlayer, ...secondPlayer }, currentPlayerMove: settings.startPlayer }))
   }, [settings.hasStarted])
 
-  const createPlayerPieces = (color: PlayerColor, offsetY: number, switchRows: boolean): Array<PieceParams> => {
-    const pieces: Array<PieceParams> = []
+  const createPlayerPieces = (color: PlayerColor, offsetY: number, switchRows: boolean): Dictionary<Piece> => {
+    const pieces: Dictionary<Piece> = {}
     const pawnY  = switchRows ? offsetY + 1 : offsetY
     const pieceY = switchRows ? offsetY     : offsetY + 1
 
     for (let i = 0; i < 8; ++i)
-      pieces.push({ color, type: PieceTypes.PAWN, position: { x: i, y: pawnY  }})
-    pieces.push({ color, type: PieceTypes.ROOK  , position: { x: 0, y: pieceY }})
-    pieces.push({ color, type: PieceTypes.KNIGHT, position: { x: 1, y: pieceY }})
-    pieces.push({ color, type: PieceTypes.BISHOP, position: { x: 2, y: pieceY }})
-    pieces.push({ color, type: PieceTypes.QUEEN , position: { x: 3, y: pieceY }})
-    pieces.push({ color, type: PieceTypes.KING  , position: { x: 4, y: pieceY }})
-    pieces.push({ color, type: PieceTypes.BISHOP, position: { x: 5, y: pieceY }})
-    pieces.push({ color, type: PieceTypes.KNIGHT, position: { x: 6, y: pieceY }})
-    pieces.push({ color, type: PieceTypes.ROOK  , position: { x: 7, y: pieceY }})
+      pieces[getPositionName({ x: i, y: pawnY })] = { color, type: PieceTypes.PAWN, position: { x: i, y: pawnY }}
+    pieces[getPositionName({ x: 0, y: pieceY })] = { color, type: PieceTypes.ROOK  , position: { x: 0, y: pieceY }}
+    pieces[getPositionName({ x: 1, y: pieceY })] = { color, type: PieceTypes.KNIGHT, position: { x: 1, y: pieceY }}
+    pieces[getPositionName({ x: 2, y: pieceY })] = { color, type: PieceTypes.BISHOP, position: { x: 2, y: pieceY }}
+    pieces[getPositionName({ x: 3, y: pieceY })] = { color, type: PieceTypes.QUEEN , position: { x: 3, y: pieceY }}
+    pieces[getPositionName({ x: 4, y: pieceY })] = { color, type: PieceTypes.KING  , position: { x: 4, y: pieceY }}
+    pieces[getPositionName({ x: 5, y: pieceY })] = { color, type: PieceTypes.BISHOP, position: { x: 5, y: pieceY }}
+    pieces[getPositionName({ x: 6, y: pieceY })] = { color, type: PieceTypes.KNIGHT, position: { x: 6, y: pieceY }}
+    pieces[getPositionName({ x: 7, y: pieceY })] = { color, type: PieceTypes.ROOK  , position: { x: 7, y: pieceY }}
 
     return pieces
   }
 
   const onCellClick = (position: Vector): void => {
-    const hasMove  = selectedPieceMoves[`${position.x}-${position.y}`]
-    const hasPiece = pieces[`${position.x}-${position.y}`]
+    const hasMove = state.selectedMoves[getPositionName(position)]
+    const hasPiece = state.pieces[getPositionName(position)]
 
     if (hasMove != undefined)
-      return onMoveClick(position, hasMove)
+      return onMoveClick(hasMove)
     if (hasPiece != undefined)
-      return onPieceClick(position, hasPiece.color, hasPiece.type)
-    return setState(prevState => ({ ...prevState, selectedPiece: undefined, selectedPieceMoves: [] }))
+      return onPieceClick(hasPiece)
+    return setState(prevState => ({ ...prevState, selected: undefined, selectedMoves: {} }))
   }
 
-  const onPieceClick = (position: Vector, color: PlayerColor, type: PieceTypes): void => {
-    if (color !== state.currentPlayerMove)
+  const onPieceClick = (piece: Piece): void => {
+    if (piece.color != state.playerMove)
       return undefined
-
-    const selectedPiece = pieces[`${position.x}-${position.y}`]
-    const selectedPieceMoves = getPieceMoves(position, color, type, pieces)
-
-    return setState(prevState => ({ ...prevState, selectedPiece, selectedPieceMoves }))
+    return setState(prevState => ({ ...prevState, selected: piece, selectedMoves: getPieceMoves(piece, state.pieces) }))
   }
 
-  const onMoveClick = (position: Vector, type: MoveTypes): void => {
-    if (!state.selectedPiece)
+  const onMoveClick = (move: PieceMove): void => {
+    const pieces = { ...state.pieces }
+    if (state.selected == undefined)
       return undefined
+    if (move.type === MoveTypes.Q_CASTLING && delete pieces[getPositionName({ x: 0, y: move.position.y })])
+      pieces[getPositionName({ x: 3, y: move.position.y })] = { ...state.pieces[getPositionName({ x: 0, y: move.position.y })], position: { x: 3, y: move.position.y }, hasMoved: true }
+    if (move.type === MoveTypes.K_CASTLING && delete pieces[getPositionName({ x: 7, y: move.position.y })])
+      pieces[getPositionName({ x: 5, y: move.position.y })] = { ...state.pieces[getPositionName({ x: 7, y: move.position.y })], position: { x: 5, y: move.position.y }, hasMoved: true }
+    if (delete pieces[getPositionName(state.selected.position)])
+      pieces[getPositionName(move.position)] = { ...state.pieces[getPositionName(state.selected.position)], position: move.position, hasMoved: true }
 
-    const nextPlayerMove = state.currentPlayerMove == PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE
-    const currentPiece = pieces[`${position.x}-${position.y}`]
-    const newStatePieces = state.pieces.map(piece => {
-      if (state.selectedPiece && type === MoveTypes.Q_CASTLING && piece.type === PieceTypes.ROOK && piece.color === state.selectedPiece.color && piece.position.x === 0)
-        return { ...piece, position: { x: 3, y: position.y }, hasMoved: true }
-      if (state.selectedPiece && type === MoveTypes.K_CASTLING && piece.type === PieceTypes.ROOK && piece.color === state.selectedPiece.color && piece.position.x === 7)
-        return { ...piece, position: { x: 5, y: position.y }, hasMoved: true }
-      if (piece != state.selectedPiece)
-        return piece
-      return { ...piece, position, hasMoved: true }
-    }).filter(piece => !currentPiece || piece != currentPiece)
-
-    const newMovesHistory = [...state.movesHistory]
-    const newPieces: Dictionary<PieceParams> = newStatePieces.reduce((r, piece) => ({ ...r, [`${piece.position.x}-${piece.position.y}`]: piece }), {})
-    const isCheck = !!getPieceMoves(position, state.currentPlayerMove, state.selectedPiece.type, newPieces).find(move => {
-      const piece = pieces[`${move.position.x}-${move.position.y}`]
-      if (!piece)
-        return false
-      return piece.type === PieceTypes.KING && piece.color === nextPlayerMove
+    const nextMoves = getPieceMoves(pieces[getPositionName(move.position)], pieces, true)
+    const isCheck = !!Object.keys(nextMoves).find(key => {
+      const currPiece = pieces[getPositionName(nextMoves[key].position)]
+      if (currPiece == undefined)
+        return undefined
+      return currPiece.type === PieceTypes.KING
     })
-    newMovesHistory.push({ newPosition: position, piece: state.selectedPiece, capturedPiece: currentPiece, type, isCheck })
+    const historyMove = { type: move.type, piece: state.selected, position: move.position, captured: state.pieces[getPositionName(move.position)], isCheck }
 
     return setState(prevState => ({
       ...prevState,
-      currentPlayerMove: nextPlayerMove,
-      pieces: newStatePieces,
-      selectedPiece: undefined,
-      selectedPieceMoves: [],
-      movesHistory: newMovesHistory
+      playerMove: prevState.playerMove === PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE,
+      pieces,
+      selected: undefined,
+      selectedMoves: {},
+      historyMoves: { ...prevState.historyMoves, [Object.keys(prevState.historyMoves).length]: historyMove },
+      lastMove: historyMove
     }))
   }
 
   return (
     <React.Fragment>
       <Board
-        pieces={pieces}
-        lastMove={lastMove}
-        selectedPiecePosition={state.selectedPiece?.position}
-        selectedPieceMoves={selectedPieceMoves}
+        pieces={state.pieces}
+        selectedPosition={state.selected?.position}
+        selectedMoves={state.selectedMoves}
+        lastMove={state.lastMove}
         onCellClick={onCellClick}
       />
       <GameInformation
-        movesHistory={state.movesHistory}
+        historyMoves={state.historyMoves}
       />
     </React.Fragment>
   )

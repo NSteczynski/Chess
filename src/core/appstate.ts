@@ -2,11 +2,11 @@ import DefaultSettings from "./settings";
 import { AppState } from "./types";
 
 const DefaultAppState: AppState = {
-  currentPlayerMove: DefaultSettings.startPlayer,
-  pieces: [],
-  selectedPiece: undefined,
-  selectedPieceMoves: [],
-  movesHistory: []
+  playerMove: DefaultSettings.startPlayer,
+  pieces: {},
+  selected: undefined,
+  selectedMoves: {},
+  historyMoves: {}
 }
 
 export default DefaultAppState

@@ -1,11 +1,11 @@
 import React from "react"
-import { MoveHistory } from "../core/types"
+import { Dictionary, HistoryMove } from "../core/types"
 import { getMoveNotationName } from "../core/functions"
 
 const MovesHistory: React.FunctionComponent<{
-  moves: Array<MoveHistory>
+  moves: Dictionary<HistoryMove>
 }> = ({ moves }) => {
-  const movesInfo = moves.map((move, index) => <span key={index}>{getMoveNotationName(move)}{move.isCheck ? "+" : ""}</span>)
+  const movesInfo = Object.keys(moves).map(key => <span key={key}>{getMoveNotationName(moves[key])}{moves[key].isCheck ? "+" : ""}</span>)
 
   return (
     <div className="movesHistory">
