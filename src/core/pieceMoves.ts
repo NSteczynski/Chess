@@ -1,4 +1,4 @@
-import { Dictionary, Vector, Piece, PieceMove, PlayerColor, PieceTypes, MoveTypes } from "./types"
+import { Dictionary, Vector, Piece, PieceMove, PlayerColor, PieceTypes, MoveTypes, HistoryMove } from "./types"
 import { getPositionName } from "./functions"
 
 /**
@@ -6,11 +6,12 @@ import { getPositionName } from "./functions"
  * @param piece The piece.
  * @param pieces The list of pieces.
  * @param checkAttack If true then checks piece posible attack moves. Default: false.
+ * @param lastMove The last move played.
  */
-const getPieceMoves = (piece: Piece, pieces: Dictionary<Piece>, checkAttack: boolean = false): Dictionary<PieceMove> => {
+const getPieceMoves = (piece: Piece, pieces: Dictionary<Piece>, checkAttack: boolean = false, lastMove?: HistoryMove): Dictionary<PieceMove> => {
   switch (piece.type) {
     case PieceTypes.PAWN:
-      return getPawnMoves(piece, pieces, checkAttack)
+      return getPawnMoves(piece, pieces, checkAttack, lastMove)
     case PieceTypes.ROOK:
       return getRookMoves(piece, pieces, checkAttack)
     case PieceTypes.KNIGHT:
@@ -26,24 +27,35 @@ const getPieceMoves = (piece: Piece, pieces: Dictionary<Piece>, checkAttack: boo
   }
 }
 
-const getPawnMoves = (piece: Piece, pieces: Dictionary<Piece>, checkAttack: boolean): Dictionary<PieceMove> => {
+const getPawnMoves = (piece: Piece, pieces: Dictionary<Piece>, checkAttack: boolean, lastMove?: HistoryMove): Dictionary<PieceMove> => {
   const direction = piece.color === PlayerColor.WHITE ? -1 : 1
 
-  const left   = { x: piece.position.x - 1, y: piece.position.y + direction     }
-  const right  = { x: piece.position.x + 1, y: piece.position.y + direction     }
-  const single = { x: piece.position.x    , y: piece.position.y + direction     }
-  const double = { x: piece.position.x    , y: piece.position.y + direction * 2 }
+  const left     = { x: piece.position.x - 1, y: piece.position.y }
+  const right    = { x: piece.position.x + 1, y: piece.position.y }
+  const leftTop  = { x: piece.position.x - 1, y: piece.position.y + direction }
+  const rightTop = { x: piece.position.x + 1, y: piece.position.y + direction }
+  const single   = { x: piece.position.x    , y: piece.position.y + direction }
+  const double   = { x: piece.position.x    , y: piece.position.y + direction * 2 }
 
-  const canMoveLeft   = pieces[getPositionName(left  )] != undefined ||  checkAttack
-  const canMoveRight  = pieces[getPositionName(right )] != undefined ||  checkAttack
-  const canMoveSingle = pieces[getPositionName(single)] == undefined && !checkAttack
-  const canMoveDouble = pieces[getPositionName(double)] == undefined && canMoveSingle && !piece.hasMoved
+  const leftPiece  = pieces[getPositionName(left )]
+  const rightPiece = pieces[getPositionName(right)]
+  const isLeftLastMove  = leftPiece  && lastMove && leftPiece.position.x  === lastMove.position.x && leftPiece.position.y  === lastMove.position.y && leftPiece.color  === lastMove.piece.color
+  const isRightLastMove = rightPiece && lastMove && rightPiece.position.x === lastMove.position.x && rightPiece.position.y === lastMove.position.y && rightPiece.color === lastMove.piece.color
+
+  const canMoveLeft     = isLeftLastMove  && lastMove?.piece.type === PieceTypes.PAWN && !lastMove.piece.hasMoved
+  const canMoveRight    = isRightLastMove && lastMove?.piece.type === PieceTypes.PAWN && !lastMove.piece.hasMoved
+  const canMoveLeftTop  = pieces[getPositionName(leftTop )] != undefined ||  checkAttack
+  const canMoveRightTop = pieces[getPositionName(rightTop)] != undefined ||  checkAttack
+  const canMoveSingle   = pieces[getPositionName(single  )] == undefined && !checkAttack
+  const canMoveDouble   = pieces[getPositionName(double  )] == undefined && canMoveSingle && !piece.hasMoved
 
   return [
-    canMoveLeft   ? getSingleMove(piece, left  , pieces, checkAttack) : undefined,
-    canMoveRight  ? getSingleMove(piece, right , pieces, checkAttack) : undefined,
-    canMoveSingle ? getSingleMove(piece, single, pieces, checkAttack) : undefined,
-    canMoveDouble ? getSingleMove(piece, double, pieces, checkAttack) : undefined
+    canMoveLeft     ? { position: leftTop , type: MoveTypes.CAPTURE, captured: leftPiece  } : undefined,
+    canMoveRight    ? { position: rightTop, type: MoveTypes.CAPTURE, captured: rightPiece } : undefined,
+    canMoveLeftTop  ? getSingleMove(piece, leftTop , pieces, checkAttack) : undefined,
+    canMoveRightTop ? getSingleMove(piece, rightTop, pieces, checkAttack) : undefined,
+    canMoveSingle   ? getSingleMove(piece, single  , pieces, checkAttack) : undefined,
+    canMoveDouble   ? getSingleMove(piece, double  , pieces, checkAttack) : undefined
   ].reduce((r, move): Dictionary<PieceMove> => {
     if (move == undefined)
       return r
@@ -135,7 +147,7 @@ const getSingleMove = (piece: Piece, newPosition: Vector, pieces: Dictionary<Pie
 
   if (!canMoveX || !canMoveY || !checkAttack && newPiece && newPiece.color === piece.color)
     return undefined
-  return { position: newPosition, type: moveType }
+  return { position: newPosition, type: moveType, captured: newPiece }
 }
 
 const getLineMoves = (piece: Piece, changeX: number, changeY: number, pieces: Dictionary<Piece>, checkAttack: boolean): Dictionary<PieceMove> => {
@@ -154,7 +166,7 @@ const getLineMoves = (piece: Piece, changeX: number, changeY: number, pieces: Di
     const moveType  = currPiece ? MoveTypes.CAPTURE : MoveTypes.MOVE
 
     if (!checkAttack && currPiece?.color === piece.color || prevPiece && prevPiece.color !== piece.color) break
-    moves[getPositionName(currPosition)] = { position: currPosition, type: moveType }
+    moves[getPositionName(currPosition)] = { position: currPosition, type: moveType, captured: currPiece }
   }
 
   return moves

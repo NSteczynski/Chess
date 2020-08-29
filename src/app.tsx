@@ -54,13 +54,15 @@ const App: React.FunctionComponent<{}> = () => {
   const onPieceClick = (piece: Piece): void => {
     if (piece.color != state.playerMove)
       return undefined
-    return setState(prevState => ({ ...prevState, selected: piece, selectedMoves: getPieceMoves(piece, state.pieces) }))
+    return setState(prevState => ({ ...prevState, selected: piece, selectedMoves: getPieceMoves(piece, state.pieces, false, state.lastMove) }))
   }
 
   const onMoveClick = (move: PieceMove): void => {
     const pieces = { ...state.pieces }
     if (state.selected == undefined)
       return undefined
+    if (move.captured)
+      delete pieces[getPositionName(move.captured.position)]
     if (move.type === MoveTypes.Q_CASTLING && delete pieces[getPositionName({ x: 0, y: move.position.y })])
       pieces[getPositionName({ x: 3, y: move.position.y })] = { ...state.pieces[getPositionName({ x: 0, y: move.position.y })], position: { x: 3, y: move.position.y }, hasMoved: true }
     if (move.type === MoveTypes.K_CASTLING && delete pieces[getPositionName({ x: 7, y: move.position.y })])
@@ -75,7 +77,7 @@ const App: React.FunctionComponent<{}> = () => {
         return undefined
       return currPiece.type === PieceTypes.KING
     })
-    const historyMove = { type: move.type, piece: state.selected, position: move.position, captured: state.pieces[getPositionName(move.position)], isCheck }
+    const historyMove = { type: move.type, piece: state.selected, position: move.position, captured: move.captured, isCheck }
 
     return setState(prevState => ({
       ...prevState,

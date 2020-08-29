@@ -11,7 +11,7 @@ export const getMoveNotationName = (move: HistoryMove): string => {
   if (move.type === MoveTypes.Q_CASTLING || move.type === MoveTypes.K_CASTLING)
     return move.type
   const pieceNotationName = PieceNotationName[move.piece.type.toUpperCase() as keyof typeof PieceNotationName]
-  const coords = xCoords[move.position.x] + move.position.y
+  const coords = xCoords[move.position.x] + (8 - move.position.y)
 
   if (move.piece.type === PieceTypes.PAWN && move.type === MoveTypes.CAPTURE)
     return xCoords[move.piece.position.x] + move.type + coords

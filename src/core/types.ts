@@ -51,6 +51,8 @@ export interface PieceMove {
   type: MoveTypes
   /** The move position. */
   position: Vector
+  /** The piece that has been captured in move. */
+  captured?: Piece
 }
 
 /** The history move. */
