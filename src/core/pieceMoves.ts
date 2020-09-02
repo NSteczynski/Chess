@@ -147,7 +147,7 @@ const getSingleMove = (piece: Piece, newPosition: Vector, pieces: Dictionary<Pie
 
   if (!checkAttack && isKingAttackedAfterMove(piece, newPosition, pieces))
     return undefined
-  if (!canMoveX || !canMoveY || !checkAttack && captured && captured.color === piece.color)
+  if (!canMoveX || !canMoveY || captured && captured.color === piece.color)
     return undefined
   return { position: newPosition, type: moveType, captured }
 }
@@ -167,7 +167,7 @@ const getLineMoves = (piece: Piece, changeX: number, changeY: number, pieces: Di
     const prevPiece = pieces[getPositionName(prevPosition)]
     const moveType  = currPiece ? MoveTypes.CAPTURE : MoveTypes.MOVE
 
-    if (!checkAttack && currPiece && currPiece.color === piece.color || prevPiece && prevPiece.color !== piece.color)
+    if (currPiece && currPiece.color === piece.color || prevPiece && prevPiece.color !== piece.color)
       break
     if (!checkAttack && isKingAttackedAfterMove(piece, currPosition, pieces))
       continue
