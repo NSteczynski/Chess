@@ -21,6 +21,14 @@ const App: React.FunctionComponent<{}> = () => {
     return setState(prevState => ({ ...prevState, pieces: { ...firstPlayer, ...secondPlayer }, currentPlayerMove: settings.startPlayer }))
   }, [settings.hasStarted])
 
+  React.useEffect(() => {
+    const playerKing = state.pieces[Object.keys(state.pieces).find(key => state.pieces[key].type === PieceTypes.KING && state.pieces[key].color === state.playerMove) as string]
+    if (!Object.keys(state.pieces).length)
+      return undefined
+    if (!Object.keys(getPieceMoves(playerKing, state.pieces)).length)
+      return setSettings(prevState => ({ ...prevState, hasStarted: false }))
+  }, [state.playerMove])
+
   const createPlayerPieces = (color: PlayerColor, offsetY: number, switchRows: boolean): Dictionary<Piece> => {
     const pieces: Dictionary<Piece> = {}
     const pawnY  = switchRows ? offsetY + 1 : offsetY

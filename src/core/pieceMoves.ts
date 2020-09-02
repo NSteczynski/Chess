@@ -142,12 +142,14 @@ const getKingMoves = (piece: Piece, pieces: Dictionary<Piece>, checkAttack: bool
 const getSingleMove = (piece: Piece, newPosition: Vector, pieces: Dictionary<Piece>, checkAttack: boolean): PieceMove | undefined => {
   const canMoveX = newPosition.x <= 7 && newPosition.x >= 0
   const canMoveY = newPosition.y <= 7 && newPosition.y >= 0
-  const newPiece = pieces[getPositionName(newPosition)]
-  const moveType = newPiece ? MoveTypes.CAPTURE : MoveTypes.MOVE
+  const captured = pieces[getPositionName(newPosition)]
+  const moveType = captured ? MoveTypes.CAPTURE : MoveTypes.MOVE
 
-  if (!canMoveX || !canMoveY || !checkAttack && newPiece && newPiece.color === piece.color)
+  if (!checkAttack && isKingAttackedAfterMove(piece, newPosition, pieces))
     return undefined
-  return { position: newPosition, type: moveType, captured: newPiece }
+  if (!canMoveX || !canMoveY || !checkAttack && captured && captured.color === piece.color)
+    return undefined
+  return { position: newPosition, type: moveType, captured }
 }
 
 const getLineMoves = (piece: Piece, changeX: number, changeY: number, pieces: Dictionary<Piece>, checkAttack: boolean): Dictionary<PieceMove> => {
@@ -155,7 +157,7 @@ const getLineMoves = (piece: Piece, changeX: number, changeY: number, pieces: Di
   const numberOfMovesX = changeX > 0 ? 7 - piece.position.x : changeX < 0 ? piece.position.x : undefined
   const numberOfMovesY = changeY > 0 ? 7 - piece.position.y : changeY < 0 ? piece.position.y : undefined
   const numberOfMoves = numberOfMovesX == undefined ? numberOfMovesY : numberOfMovesY == undefined ? numberOfMovesX : numberOfMovesX < numberOfMovesY ? numberOfMovesX : numberOfMovesY
-  if (!numberOfMoves)
+  if (numberOfMoves == undefined)
     return moves
 
   for (let i = 1; i <= numberOfMoves; ++i) {
@@ -165,26 +167,34 @@ const getLineMoves = (piece: Piece, changeX: number, changeY: number, pieces: Di
     const prevPiece = pieces[getPositionName(prevPosition)]
     const moveType  = currPiece ? MoveTypes.CAPTURE : MoveTypes.MOVE
 
-    if (!checkAttack && currPiece?.color === piece.color || prevPiece && prevPiece.color !== piece.color) break
+    if (!checkAttack && currPiece && currPiece.color === piece.color || prevPiece && prevPiece.color !== piece.color)
+      break
+    if (!checkAttack && isKingAttackedAfterMove(piece, currPosition, pieces))
+      continue
     moves[getPositionName(currPosition)] = { position: currPosition, type: moveType, captured: currPiece }
   }
 
   return moves
 }
 
-/**
- * Returns true if position is attacked by provided color.
- * @param position The position to be checked.
- * @param color The color that attack.
- * @pieces The list of pieces.
- */
-export const isPositionAttacked = (position: Vector, color: PlayerColor, pieces: Dictionary<Piece>): boolean => {
+const isPositionAttacked = (position: Vector, color: PlayerColor, pieces: Dictionary<Piece>): boolean => {
   return !!Object.keys(pieces).find(key => {
     const current = pieces[key]
     if (current.color !== color)
       return false
     return getPieceMoves(current, pieces, true)[getPositionName(position)]
   })
+}
+
+const isKingAttackedAfterMove = (piece: Piece, newPosition: Vector, pieces: Dictionary<Piece>): boolean => {
+  const king = pieces[Object.keys(pieces).find(key => pieces[key].type === PieceTypes.KING && pieces[key].color === piece.color) as string]
+  const oppositeColor = king.color === PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE
+  const tempPieces = { ...pieces }
+  if (delete tempPieces[getPositionName(piece.position)])
+    tempPieces[getPositionName(newPosition)] = piece
+  if (piece.type === PieceTypes.KING)
+    return isPositionAttacked(newPosition, oppositeColor, tempPieces)
+  return isPositionAttacked(king.position, oppositeColor, tempPieces)
 }
 
 export default getPieceMoves
