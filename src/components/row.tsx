@@ -1,6 +1,7 @@
 import React from "react"
-import { Dictionary, Vector, Piece, HistoryMove, PieceMove } from "../core/types"
-import {getPositionName} from "../core/functions"
+import PromotionMenu from "./promotionMenu"
+import { getPositionName } from "../core/functions"
+import { Dictionary, Vector, Piece, HistoryMove, PieceMove, PieceTypes } from "../core/types"
 
 const Row: React.FunctionComponent<{
   id: number
@@ -8,18 +9,23 @@ const Row: React.FunctionComponent<{
   selectedPosition: Vector | undefined
   selectedMoves: Dictionary<PieceMove>
   lastMove: HistoryMove | undefined
+  promotionPiece: Piece | undefined
   onCellClick: (position: Vector) => void
-}> = ({ id, pieces, selectedPosition, selectedMoves, lastMove, onCellClick }) => {
+  onPromotionClick: (piece: Piece, type: PieceTypes.ROOK | PieceTypes.BISHOP | PieceTypes.QUEEN) => void
+}> = ({ id, pieces, selectedPosition, selectedMoves, lastMove, promotionPiece, onCellClick, onPromotionClick }) => {
   const cells = Array(8).fill(undefined).map((v, x) => {
     const current = pieces[getPositionName({ x, y: id })]
     const isSelected = selectedPosition && selectedPosition.x === x && selectedPosition.y === id
     const isLastMove = lastMove && (lastMove.position.x === x && lastMove.position.y === id  || lastMove.piece.position.x === x && lastMove.piece.position.y === id)
     const type = (id + x) % 2 === 0 ? "even" : "odd"
     const className = "cell " + type + (selectedMoves[getPositionName({ x, y: id })] != undefined ? " move" : "") + (isSelected || isLastMove ? " selected" : "")
+    const displayPromotionMenu = promotionPiece && promotionPiece.position.x === x && promotionPiece.position.y === id
+    console.log(displayPromotionMenu)
 
     return (
       <div key={x} className={className} onClick={() => onCellClick({ x, y: id })}>
         {current && <span className={`piece ${current.color}`}><i className={`fas fa-chess-${current.type}`} /></span>}
+        {displayPromotionMenu && promotionPiece && <PromotionMenu promotionPiece={promotionPiece} onPromotionClick={onPromotionClick} />}
       </div>
     )
   })

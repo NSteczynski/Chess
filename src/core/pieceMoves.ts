@@ -59,6 +59,8 @@ const getPawnMoves = (piece: Piece, pieces: Dictionary<Piece>, checkAttack: bool
   ].reduce((r, move): Dictionary<PieceMove> => {
     if (move == undefined)
       return r
+    if (move.position.y + direction < 0 || move.position.y + direction > 7)
+      return { ...r, [getPositionName(move.position)]: { ...move, promotion: true } }
     return { ...r, [getPositionName(move.position)]: move }
   }, {})
 }

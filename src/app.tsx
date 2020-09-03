@@ -1,6 +1,7 @@
 import React from "react"
 import Board from "./components/board"
 import GameInformation from "./components/gameInformation"
+import PromotionMenu from "./components/promotionMenu"
 import DefaultSettings from "./core/settings"
 import DefaultAppState from "./core/appstate"
 import getPieceMoves from "./core/pieceMoves"
@@ -49,6 +50,9 @@ const App: React.FunctionComponent<{}> = () => {
   }
 
   const onCellClick = (position: Vector): void => {
+    if (state.promotionPiece != undefined)
+      return undefined
+
     const hasMove = state.selectedMoves[getPositionName(position)]
     const hasPiece = state.pieces[getPositionName(position)]
 
@@ -94,7 +98,19 @@ const App: React.FunctionComponent<{}> = () => {
       selected: undefined,
       selectedMoves: {},
       historyMoves: { ...prevState.historyMoves, [Object.keys(prevState.historyMoves).length]: historyMove },
-      lastMove: historyMove
+      lastMove: historyMove,
+      promotionPiece: move.promotion ? pieces[getPositionName(move.position)] : undefined
+    }))
+  }
+
+  const onPromotionClick = (piece: Piece, type: PieceTypes.ROOK | PieceTypes.BISHOP | PieceTypes.QUEEN): void => {
+    const pieces = { ...state.pieces, [getPositionName(piece.position)]: { ...piece, type } }
+    const updateHistoryMove = { ...state.historyMoves[Object.keys(state.historyMoves).length - 1], promotion: type }
+    return setState(prevState => ({
+      ...prevState,
+      pieces,
+      historyMoves: { ...prevState.historyMoves, [Object.keys(prevState.historyMoves).length - 1]: updateHistoryMove },
+      promotionPiece: undefined
     }))
   }
 
@@ -102,14 +118,14 @@ const App: React.FunctionComponent<{}> = () => {
     <React.Fragment>
       <Board
         pieces={state.pieces}
-        selectedPosition={state.selected?.position}
+        selectedPosition={state.selected && state.selected.position}
         selectedMoves={state.selectedMoves}
         lastMove={state.lastMove}
+        promotionPiece={state.promotionPiece}
         onCellClick={onCellClick}
+        onPromotionClick={onPromotionClick}
       />
-      <GameInformation
-        historyMoves={state.historyMoves}
-      />
+      <GameInformation historyMoves={state.historyMoves} />
     </React.Fragment>
   )
 }

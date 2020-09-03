@@ -31,6 +31,8 @@ export interface AppState {
   selected?: Piece
   /** The last move played. */
   lastMove?: HistoryMove
+  /** The piece that will be promoted. */
+  promotionPiece?: Piece
 }
 
 /** The piece. */
@@ -53,6 +55,8 @@ export interface PieceMove {
   position: Vector
   /** The piece that has been captured in move. */
   captured?: Piece
+  /** Determines if piece should promote. Only works if piece.type is PieceTypes.PAWN. */
+  promotion?: boolean
 }
 
 /** The history move. */
@@ -67,6 +71,8 @@ export interface HistoryMove {
   captured?: Piece
   /** Determines if move provides the check. */
   isCheck?: boolean
+  /** The piece promotion. */
+  promotion?: PieceTypes.ROOK | PieceTypes.BISHOP | PieceTypes.QUEEN
 }
 
 /** The player color. */
@@ -90,7 +96,7 @@ export enum MoveTypes {
   MOVE       = "",
   CAPTURE    = "x",
   K_CASTLING = "0-0",
-  Q_CASTLING = "0-0-0"
+  Q_CASTLING = "0-0-0",
 }
 
 /** The piece type algebraic notation name. */
