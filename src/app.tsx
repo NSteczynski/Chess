@@ -1,10 +1,10 @@
 import React from "react"
+import GameMenu from "./components/gameMenu"
 import Board from "./components/board"
 import GameInformation from "./components/gameInformation"
-import PromotionMenu from "./components/promotionMenu"
 import DefaultSettings from "./core/settings"
 import DefaultAppState from "./core/appstate"
-import getPieceMoves from "./core/pieceMoves"
+import getPieceMoves, { isPositionAttacked } from "./core/pieceMoves"
 import { getPositionName } from "./core/functions"
 import { Dictionary, Vector, Settings, AppState, Piece, PlayerColor, PieceTypes, PieceMove, MoveTypes } from "./core/types"
 
@@ -19,15 +19,16 @@ const App: React.FunctionComponent<{}> = () => {
     const secondPlayerColor = settings.startPlayer === PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE
     const firstPlayer = createPlayerPieces(settings.startPlayer, 6, false)
     const secondPlayer = createPlayerPieces(secondPlayerColor, 0, true)
-    return setState(prevState => ({ ...prevState, pieces: { ...firstPlayer, ...secondPlayer }, currentPlayerMove: settings.startPlayer }))
+    return setState({ ...DefaultAppState, pieces: { ...firstPlayer, ...secondPlayer }, playerMove: settings.startPlayer })
   }, [settings.hasStarted])
 
   React.useEffect(() => {
     const playerKing = state.pieces[Object.keys(state.pieces).find(key => state.pieces[key].type === PieceTypes.KING && state.pieces[key].color === state.playerMove) as string]
-    if (!Object.keys(state.pieces).length)
+    const oppositeColor = state.playerMove === PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE
+    if (!Object.keys(state.pieces).length || Object.keys(getPieceMoves(playerKing, state.pieces)).length  || !isPositionAttacked(playerKing.position, oppositeColor, state.pieces))
       return undefined
-    if (!Object.keys(getPieceMoves(playerKing, state.pieces)).length)
-      return setSettings(prevState => ({ ...prevState, hasStarted: false }))
+
+    return setSettings(prevState => ({ ...prevState, hasStarted: false, startPlayer: state.playerMove, score: { ...prevState.score, [oppositeColor]: prevState.score[oppositeColor] + 1 } }))
   }, [state.playerMove])
 
   const createPlayerPieces = (color: PlayerColor, offsetY: number, switchRows: boolean): Dictionary<Piece> => {
@@ -35,8 +36,8 @@ const App: React.FunctionComponent<{}> = () => {
     const pawnY  = switchRows ? offsetY + 1 : offsetY
     const pieceY = switchRows ? offsetY     : offsetY + 1
 
-    for (let i = 0; i < 8; ++i)
-      pieces[getPositionName({ x: i, y: pawnY })] = { color, type: PieceTypes.PAWN, position: { x: i, y: pawnY }}
+    // for (let i = 0; i < 8; ++i)
+    //   pieces[getPositionName({ x: i, y: pawnY })] = { color, type: PieceTypes.PAWN, position: { x: i, y: pawnY }}
     pieces[getPositionName({ x: 0, y: pieceY })] = { color, type: PieceTypes.ROOK  , position: { x: 0, y: pieceY }}
     pieces[getPositionName({ x: 1, y: pieceY })] = { color, type: PieceTypes.KNIGHT, position: { x: 1, y: pieceY }}
     pieces[getPositionName({ x: 2, y: pieceY })] = { color, type: PieceTypes.BISHOP, position: { x: 2, y: pieceY }}
@@ -48,6 +49,8 @@ const App: React.FunctionComponent<{}> = () => {
 
     return pieces
   }
+
+  const onGameStart = (): void => setSettings(prevState => ({ ...prevState, hasStarted: true }))
 
   const onCellClick = (position: Vector): void => {
     if (state.promotionPiece != undefined)
@@ -116,15 +119,18 @@ const App: React.FunctionComponent<{}> = () => {
 
   return (
     <React.Fragment>
-      <Board
-        pieces={state.pieces}
-        selectedPosition={state.selected && state.selected.position}
-        selectedMoves={state.selectedMoves}
-        lastMove={state.lastMove}
-        promotionPiece={state.promotionPiece}
-        onCellClick={onCellClick}
-        onPromotionClick={onPromotionClick}
-      />
+      <div className="gameContainer">
+        <GameMenu {...settings} onGameStart={onGameStart} />
+        <Board
+            pieces={state.pieces}
+            selectedPosition={state.selected && state.selected.position}
+            selectedMoves={state.selectedMoves}
+            lastMove={state.lastMove}
+            promotionPiece={state.promotionPiece}
+            onCellClick={onCellClick}
+            onPromotionClick={onPromotionClick}
+          />
+      </div>
       <GameInformation historyMoves={state.historyMoves} />
     </React.Fragment>
   )

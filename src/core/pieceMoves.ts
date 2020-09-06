@@ -179,7 +179,13 @@ const getLineMoves = (piece: Piece, changeX: number, changeY: number, pieces: Di
   return moves
 }
 
-const isPositionAttacked = (position: Vector, color: PlayerColor, pieces: Dictionary<Piece>): boolean => {
+/**
+ * Returns true if position is attacked by provided PlayerColor.
+ * @param position The position to be checked.
+ * @param color The PlayerColor that attack.
+ * @param pieces The dictionary of pieces.
+ */
+export const isPositionAttacked = (position: Vector, color: PlayerColor, pieces: Dictionary<Piece>): boolean => {
   return !!Object.keys(pieces).find(key => {
     const current = pieces[key]
     if (current.color !== color)

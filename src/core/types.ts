@@ -1,6 +1,9 @@
 /** The dictionary with string as key. */
 export type Dictionary<T> = { [name: string]: T }
 
+/** The dictionary with enum as key. */
+export type EnumDictionary<T extends string | symbol | number, U> = { [K in T]: U }
+
 /** The vector 2D. */
 export interface Vector {
   /** The parameter x. */
@@ -15,6 +18,8 @@ export interface Settings {
   hasStarted: boolean
   /** Determines which player starts the game. */
   startPlayer: PlayerColor
+  /** The game score. */
+  score: EnumDictionary<PlayerColor, number>
 }
 
 /** The app state. */

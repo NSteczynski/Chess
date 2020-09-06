@@ -22,7 +22,7 @@
     height: 100%;
 
     &:hover { cursor: pointer; }
-    &.black { color: $blackPiece; }
-    &.white { color: $whitePiece; }
+    &.black > i:before { color: $blackPiece; font-family: inherit; }
+    &.white > i:before { color: $whitePiece; font-family: inherit; }
   }
 }
