@@ -4,8 +4,17 @@ import { getMoveNotationName } from "../core/functions"
 
 const MovesHistory: React.FunctionComponent<{
   moves: Dictionary<HistoryMove>
-}> = ({ moves }) => {
-  const movesInfo = Object.keys(moves).map(key => <span key={key}>{getMoveNotationName(moves[key])}{moves[key].isCheck ? "+" : ""}</span>)
+  lastMove: HistoryMove | undefined
+  onHistoryMoveClick: (move: HistoryMove) => void
+}> = ({ moves, lastMove, onHistoryMoveClick }) => {
+  const movesInfo = Object.keys(moves).map(key => {
+    const className = lastMove && moves[key].id == lastMove.id ? "active" : ""
+    return (
+      <span key={key} className={className} onClick={() => onHistoryMoveClick(moves[key])}>
+        {getMoveNotationName(moves[key])}
+      </span>
+    )
+  })
 
   return (
     <div className="movesHistory">

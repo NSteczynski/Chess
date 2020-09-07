@@ -66,6 +66,8 @@ export interface PieceMove {
 
 /** The history move. */
 export interface HistoryMove {
+  /** The move id. */
+  id: number
   /** The move type. */
   type: MoveTypes
   /** The piece that has moved. */

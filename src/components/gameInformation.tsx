@@ -4,9 +4,15 @@ import { Dictionary, HistoryMove } from "../core/types"
 
 const GameInformation: React.FunctionComponent<{
   historyMoves: Dictionary<HistoryMove>
-}> = ({ historyMoves }) => (
+  lastMove: HistoryMove | undefined
+  onHistoryMoveClick: (move: HistoryMove) => void
+}> = ({ historyMoves, lastMove, onHistoryMoveClick }) => (
   <div className="gameInformation">
-    <MovesHistory moves={historyMoves} />
+    <MovesHistory
+      moves={historyMoves}
+      lastMove={lastMove}
+      onHistoryMoveClick={onHistoryMoveClick}
+    />
   </div>
 )
 
