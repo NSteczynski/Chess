@@ -10,9 +10,9 @@ const MovesHistory: React.FunctionComponent<{
   const movesInfo = Object.keys(moves).map(key => {
     const className = lastMove && moves[key].id == lastMove.id ? "active" : ""
     return (
-      <span key={key} className={className} onClick={() => onHistoryMoveClick(moves[key])}>
+      <button key={key} className={className} onClick={() => onHistoryMoveClick(moves[key])}>
         {getMoveNotationName(moves[key])}
-      </span>
+      </button>
     )
   })
 

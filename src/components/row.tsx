@@ -17,15 +17,16 @@ const Row: React.FunctionComponent<{
     const current = pieces[getPositionName({ x, y: id })]
     const isSelected = selectedPosition && selectedPosition.x === x && selectedPosition.y === id
     const isLastMove = lastMove && (lastMove.position.x === x && lastMove.position.y === id  || lastMove.piece.position.x === x && lastMove.piece.position.y === id)
-    const type = (id + x) % 2 === 0 ? "even" : "odd"
-    const className = "cell " + type + (selectedMoves[getPositionName({ x, y: id })] != undefined ? " move" : "") + (isSelected || isLastMove ? " selected" : "")
+    const isMove = selectedMoves[getPositionName({ x, y: id })] != undefined
+    const className = "cell " + ((id + x) % 2 === 0 ? "even" : "odd") + (isMove ? " move" : "") + (isSelected || isLastMove ? " selected" : "")
     const displayPromotionMenu = promotionPiece && promotionPiece.position.x === x && promotionPiece.position.y === id
+    const Type = isMove || current ? "button" : "div"
 
     return (
-      <div key={x} className={className} onClick={() => onCellClick({ x, y: id })}>
+      <Type key={x} className={className} onClick={() => onCellClick({ x, y: id })}>
         {current && <span className={`piece ${current.color}`}><i className={`fas fa-chess-${current.type}`} /></span>}
         {displayPromotionMenu && promotionPiece && <PromotionMenu promotionPiece={promotionPiece} onPromotionClick={onPromotionClick} />}
-      </div>
+      </Type>
     )
   })
 
