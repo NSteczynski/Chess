@@ -1,4 +1,4 @@
-import { PieceTypes, HistoryMove, MoveTypes, PieceNotationName, Vector } from "./types"
+import { PieceTypes, HistoryMove, MoveTypes, PieceNotationName, Vector, PlayerColor } from "./types"
 
 /** The x coordinates. */
 export const xCoords = ["a", "b", "c", "d", "e", "f", "g", "h"]
@@ -26,4 +26,12 @@ export const getMoveNotationName = (move: HistoryMove): string => {
  */
 export const getPositionName = (position: Vector): string => {
   return position.x + "-" + position.y
+}
+
+/**
+ * Returns the opposite color.
+ * @param color The color that must be switched.
+ */
+export const getOppositeColor = (color: PlayerColor): PlayerColor => {
+  return color === PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE
 }

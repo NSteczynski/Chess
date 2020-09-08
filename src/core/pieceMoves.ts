@@ -1,5 +1,5 @@
 import { Dictionary, Vector, Piece, PieceMove, PlayerColor, PieceTypes, MoveTypes, HistoryMove } from "./types"
-import { getPositionName } from "./functions"
+import { getPositionName, getOppositeColor } from "./functions"
 
 /**
  * Returns available moves for piece type.
@@ -109,7 +109,7 @@ const getQueenMoves = (piece: Piece, pieces: Dictionary<Piece>, checkAttack: boo
 
 const getKingMoves = (piece: Piece, pieces: Dictionary<Piece>, checkAttack: boolean): Dictionary<PieceMove> => {
   const moves: Dictionary<PieceMove> = {}
-  const oppositeColor = piece.color === PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE
+  const oppositeColor = getOppositeColor(piece.color)
   const isKingSafe = !checkAttack && !isPositionAttacked(piece.position, oppositeColor, pieces)
   const qSideCastlingPosition = { x: 2, y: piece.position.y }
   const kSideCastlingPosition = { x: 6, y: piece.position.y }
@@ -196,7 +196,7 @@ export const isPositionAttacked = (position: Vector, color: PlayerColor, pieces:
 
 const isKingAttackedAfterMove = (piece: Piece, newPosition: Vector, pieces: Dictionary<Piece>): boolean => {
   const king = pieces[Object.keys(pieces).find(key => pieces[key].type === PieceTypes.KING && pieces[key].color === piece.color) as string]
-  const oppositeColor = king.color === PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE
+  const oppositeColor = getOppositeColor(king.color)
   const tempPieces = { ...pieces }
   if (delete tempPieces[getPositionName(piece.position)])
     tempPieces[getPositionName(newPosition)] = piece

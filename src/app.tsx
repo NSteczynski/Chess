@@ -5,7 +5,7 @@ import GameInformation from "./components/gameInformation"
 import DefaultSettings from "./core/settings"
 import DefaultAppState from "./core/appstate"
 import getPieceMoves, { isPositionAttacked } from "./core/pieceMoves"
-import { getPositionName } from "./core/functions"
+import { getPositionName, getOppositeColor } from "./core/functions"
 import { Dictionary, Vector, Settings, AppState, Piece, HistoryMove, PlayerColor, PieceTypes, PieceMove, MoveTypes } from "./core/types"
 
 let HISTORY_MOVE_ID = 0
@@ -28,7 +28,7 @@ const App: React.FunctionComponent<{}> = () => {
 
   React.useEffect(() => {
     const playerKing = state.pieces[Object.keys(state.pieces).find(key => state.pieces[key].type === PieceTypes.KING && state.pieces[key].color === state.playerMove) as string]
-    const oppositeColor = state.playerMove === PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE
+    const oppositeColor = getOppositeColor(state.playerMove)
     if (!Object.keys(state.pieces).length || Object.keys(getPieceMoves(playerKing, state.pieces)).length  || !isPositionAttacked(playerKing.position, oppositeColor, state.pieces))
       return undefined
 
@@ -97,7 +97,7 @@ const App: React.FunctionComponent<{}> = () => {
       return currPiece.type === PieceTypes.KING
     })
     const historyMove = { id: HISTORY_MOVE_ID++, type: move.type, piece: state.selected, position: move.position, captured: move.captured, isCheck }
-    const prevHistoryMoves = Object.keys(state.historyMoves).reduce((r, key) => {
+    const prevHistoryMoves = state.lastMove == undefined ? {} : Object.keys(state.historyMoves).reduce((r, key) => {
       if (state.lastMove && state.historyMoves[key].id > state.lastMove.id)
         return r
       return { ...r, [key]: { ...state.historyMoves[key] } }
