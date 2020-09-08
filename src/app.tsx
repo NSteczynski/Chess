@@ -71,8 +71,8 @@ const App: React.FunctionComponent<{}> = () => {
   }
 
   const onPieceClick = (piece: Piece): void => {
-    if (piece.color != state.playerMove)
-      return undefined
+    if (piece.color != state.playerMove || state.selected && piece.position.x === state.selected.position.x && piece.position.y === state.selected.position.y)
+      return setState(prevState => ({ ...prevState, selected: undefined, selectedMoves: {} }))
     return setState(prevState => ({ ...prevState, selected: piece, selectedMoves: getPieceMoves(piece, state.pieces, false, state.lastMove) }))
   }
 
@@ -168,7 +168,7 @@ const App: React.FunctionComponent<{}> = () => {
   }
 
   const updateAfterHistoryChange = (move: HistoryMove | undefined, pieces: Dictionary<Piece>): void => {
-    const playerMove = move == undefined ? settings.startPlayer : move.piece.color === PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE
+    const playerMove = move == undefined ? settings.startPlayer : getOppositeColor(move.piece.color)
     return setState(prevState => ({
       ...prevState,
       playerMove,
@@ -211,14 +211,16 @@ const App: React.FunctionComponent<{}> = () => {
       <div className="gameContainer">
         <GameMenu {...settings} onGameStart={onGameStart} />
         <Board
-            pieces={state.pieces}
-            selectedPosition={state.selected && state.selected.position}
-            selectedMoves={state.selectedMoves}
-            lastMove={state.lastMove}
-            promotionPiece={state.promotionPiece}
-            onCellClick={onCellClick}
-            onPromotionClick={onPromotionClick}
-          />
+          playerMove={state.playerMove}
+          pieces={state.pieces}
+          selectedPosition={state.selected && state.selected.position}
+          selectedMoves={state.selectedMoves}
+          lastMove={state.lastMove}
+          promotionPiece={state.promotionPiece}
+          disabled={!settings.hasStarted}
+          onCellClick={onCellClick}
+          onPromotionClick={onPromotionClick}
+        />
       </div>
       <GameInformation
         historyMoves={state.historyMoves}

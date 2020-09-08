@@ -1,18 +1,20 @@
 import React from "react"
 import PromotionMenu from "./promotionMenu"
 import { getPositionName } from "../core/functions"
-import { Dictionary, Vector, Piece, HistoryMove, PieceMove, PieceTypes } from "../core/types"
+import { Dictionary, Vector, Piece, HistoryMove, PieceMove, PieceTypes, PlayerColor } from "../core/types"
 
 const Row: React.FunctionComponent<{
   id: number
+  playerMove: PlayerColor
   pieces: Dictionary<Piece>
   selectedPosition: Vector | undefined
   selectedMoves: Dictionary<PieceMove>
   lastMove: HistoryMove | undefined
   promotionPiece: Piece | undefined
+  disabled: boolean
   onCellClick: (position: Vector) => void
   onPromotionClick: (piece: Piece, type: PieceTypes.ROOK | PieceTypes.BISHOP | PieceTypes.QUEEN) => void
-}> = ({ id, pieces, selectedPosition, selectedMoves, lastMove, promotionPiece, onCellClick, onPromotionClick }) => {
+}> = ({ id, playerMove, pieces, selectedPosition, selectedMoves, lastMove, promotionPiece, disabled, onCellClick, onPromotionClick }) => {
   const cells = Array(8).fill(undefined).map((v, x) => {
     const current = pieces[getPositionName({ x, y: id })]
     const isSelected = selectedPosition && selectedPosition.x === x && selectedPosition.y === id
@@ -20,7 +22,7 @@ const Row: React.FunctionComponent<{
     const isMove = selectedMoves[getPositionName({ x, y: id })] != undefined
     const className = "cell " + ((id + x) % 2 === 0 ? "even" : "odd") + (isMove ? " move" : "") + (isSelected || isLastMove ? " selected" : "")
     const displayPromotionMenu = promotionPiece && promotionPiece.position.x === x && promotionPiece.position.y === id
-    const Type = isMove || current ? "a" : "div"
+    const Type = isMove || current && !disabled && current.color === playerMove ? "a" : "div"
 
     return (
       <Type key={x} className={className} onClick={() => onCellClick({ x, y: id })}>

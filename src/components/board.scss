@@ -31,6 +31,9 @@
         background: $move;
       }
 
+      &:not(a) > .piece:hover { cursor: auto; }
+      &.move:hover { cursor: pointer; }
+
       & > .piece {
         display: flex;
         justify-content: center;
