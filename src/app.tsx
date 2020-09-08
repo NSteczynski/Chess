@@ -218,7 +218,7 @@ const App: React.FunctionComponent<{}> = () => {
           selectedMoves={state.selectedMoves}
           lastMove={state.lastMove}
           promotionPiece={state.promotionPiece}
-          disabled={!settings.hasStarted}
+          disabled={!settings.hasStarted || state.promotionPiece != undefined}
           onCellClick={onCellClick}
           onPromotionClick={onPromotionClick}
         />
