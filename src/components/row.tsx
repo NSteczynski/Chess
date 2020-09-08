@@ -20,7 +20,7 @@ const Row: React.FunctionComponent<{
     const isMove = selectedMoves[getPositionName({ x, y: id })] != undefined
     const className = "cell " + ((id + x) % 2 === 0 ? "even" : "odd") + (isMove ? " move" : "") + (isSelected || isLastMove ? " selected" : "")
     const displayPromotionMenu = promotionPiece && promotionPiece.position.x === x && promotionPiece.position.y === id
-    const Type = isMove || current ? "button" : "div"
+    const Type = isMove || current ? "a" : "div"
 
     return (
       <Type key={x} className={className} onClick={() => onCellClick({ x, y: id })}>

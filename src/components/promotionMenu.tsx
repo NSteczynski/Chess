@@ -6,17 +6,17 @@ const PromotionMenu: React.FunctionComponent<{
   onPromotionClick: (piece: Piece, type: PieceTypes.ROOK | PieceTypes.BISHOP | PieceTypes.QUEEN) => void
 }> = ({ promotionPiece, onPromotionClick }) => (
   <div className={`promotionMenu ${promotionPiece.color}`}>
-    <button onClick={() => onPromotionClick(promotionPiece, PieceTypes.ROOK)} className={`piece ${promotionPiece.color}`}>
+    <a onClick={() => onPromotionClick(promotionPiece, PieceTypes.ROOK)} className={`piece ${promotionPiece.color}`}>
       <i className={`fas fa-chess-${PieceTypes.ROOK}`} />
-    </button>
+    </a>
 
-    <button onClick={() => onPromotionClick(promotionPiece, PieceTypes.BISHOP)} className={`piece ${promotionPiece.color}`}>
+    <a onClick={() => onPromotionClick(promotionPiece, PieceTypes.BISHOP)} className={`piece ${promotionPiece.color}`}>
       <i className={`fas fa-chess-${PieceTypes.BISHOP}`} />
-    </button>
+    </a>
 
-    <button onClick={() => onPromotionClick(promotionPiece, PieceTypes.QUEEN)} className={`piece ${promotionPiece.color}`}>
+    <a onClick={() => onPromotionClick(promotionPiece, PieceTypes.QUEEN)} className={`piece ${promotionPiece.color}`}>
       <i className={`fas fa-chess-${PieceTypes.QUEEN}`} />
-    </button>
+    </a>
   </div>
 )
 
