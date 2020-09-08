@@ -33,7 +33,7 @@ module.exports = {
     historyApiFallback: true
   },
   plugins: [
-    new CopyWebpackPlugin({ patterns: [{ from: 'public' }]}),
+    new CopyWebpackPlugin({ patterns: [{ from: 'public/favicon.ico' }]}),
     new HTMLWebpackPlugin({
       template: './public/index.html'
     })
