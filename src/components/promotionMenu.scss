@@ -9,8 +9,8 @@
   height: 300%;
   z-index: 1;
 
-  &.white { flex-direction: column-reverse; top: 100%; }
-  &.black { flex-direction: column; bottom: 100%; }
+  &.white:not(.flip), &.black.flip { flex-direction: column-reverse; top: 100%; }
+  &.black:not(.flip), &.white.flip { flex-direction: column; bottom: 100%; }
 
   & > .piece {
     display: flex;

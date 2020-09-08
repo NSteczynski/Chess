@@ -5,6 +5,7 @@ import { Dictionary, Vector, Piece, HistoryMove, PieceMove, PieceTypes, PlayerCo
 const Board: React.FunctionComponent<{
   playerMove: PlayerColor
   pieces: Dictionary<Piece>
+  flip: boolean
   selectedPosition: Vector | undefined
   selectedMoves: Dictionary<PieceMove>
   lastMove: HistoryMove | undefined
@@ -12,13 +13,14 @@ const Board: React.FunctionComponent<{
   disabled: boolean
   onCellClick: (position: Vector) => void
   onPromotionClick: (piece: Piece, type: PieceTypes.ROOK | PieceTypes.BISHOP | PieceTypes.QUEEN) => void
-}> = ({ playerMove, pieces, selectedPosition, selectedMoves, lastMove, promotionPiece, disabled, onCellClick, onPromotionClick }) => {
+}> = ({ playerMove, pieces, flip, selectedPosition, selectedMoves, lastMove, promotionPiece, disabled, onCellClick, onPromotionClick }) => {
   const rows = Array(8).fill(undefined).map((v, y) => (
     <Row
       key={y}
       id={y}
       playerMove={playerMove}
       pieces={pieces}
+      flip={flip}
       selectedPosition={selectedPosition}
       selectedMoves={selectedMoves}
       lastMove={lastMove}

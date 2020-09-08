@@ -14,10 +14,10 @@ export interface Vector {
 
 /** The game settings. */
 export interface Settings {
-  /** If true then game is started. */
-  hasStarted: boolean
   /** Determines which player starts the game. */
   startPlayer: PlayerColor
+  /** Determines if board pieces should be flipped in y-axis. */
+  flip: boolean
   /** The game score. */
   score: EnumDictionary<PlayerColor, number>
 }
@@ -79,7 +79,7 @@ export interface HistoryMove {
   /** Determines if move provides the check. */
   isCheck?: boolean
   /** Determines if move ends game. */
-  isEndMove?: boolean
+  isCheckmate?: boolean
   /** The piece promotion. */
   promotion?: PieceTypes.ROOK | PieceTypes.BISHOP | PieceTypes.QUEEN
 }

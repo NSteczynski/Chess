@@ -7,6 +7,7 @@ const Row: React.FunctionComponent<{
   id: number
   playerMove: PlayerColor
   pieces: Dictionary<Piece>
+  flip: boolean
   selectedPosition: Vector | undefined
   selectedMoves: Dictionary<PieceMove>
   lastMove: HistoryMove | undefined
@@ -14,20 +15,21 @@ const Row: React.FunctionComponent<{
   disabled: boolean
   onCellClick: (position: Vector) => void
   onPromotionClick: (piece: Piece, type: PieceTypes.ROOK | PieceTypes.BISHOP | PieceTypes.QUEEN) => void
-}> = ({ id, playerMove, pieces, selectedPosition, selectedMoves, lastMove, promotionPiece, disabled, onCellClick, onPromotionClick }) => {
+}> = ({ id, playerMove, pieces, flip, selectedPosition, selectedMoves, lastMove, promotionPiece, disabled, onCellClick, onPromotionClick }) => {
   const cells = Array(8).fill(undefined).map((v, x) => {
-    const current = pieces[getPositionName({ x, y: id })]
-    const isSelected = selectedPosition && selectedPosition.x === x && selectedPosition.y === id
-    const isLastMove = lastMove && (lastMove.position.x === x && lastMove.position.y === id  || lastMove.piece.position.x === x && lastMove.piece.position.y === id)
-    const isMove = selectedMoves[getPositionName({ x, y: id })] != undefined
+    const cellPosition = { x, y: flip ? 7 - id : id }
+    const current = pieces[getPositionName(cellPosition)]
+    const isSelected = selectedPosition && selectedPosition.x === cellPosition.x && selectedPosition.y === cellPosition.y
+    const isLastMove = lastMove && (lastMove.position.x === cellPosition.x && lastMove.position.y === cellPosition.y  || lastMove.piece.position.x === cellPosition.x && lastMove.piece.position.y === cellPosition.y)
+    const isMove = selectedMoves[getPositionName(cellPosition)] != undefined
     const className = "cell " + ((id + x) % 2 === 0 ? "even" : "odd") + (isMove ? " move" : "") + (isSelected || isLastMove ? " selected" : "")
-    const displayPromotionMenu = promotionPiece && promotionPiece.position.x === x && promotionPiece.position.y === id
+    const displayPromotionMenu = promotionPiece && promotionPiece.position.x === cellPosition.x && promotionPiece.position.y === cellPosition.y
     const Type = isMove || current && !disabled && current.color === playerMove ? "a" : "div"
 
     return (
-      <Type key={x} className={className} onClick={() => onCellClick({ x, y: id })}>
+      <Type key={x} className={className} onClick={() => onCellClick(cellPosition)}>
         {current && <span className={`piece ${current.color}`}><i className={`fas fa-chess-${current.type}`} /></span>}
-        {displayPromotionMenu && promotionPiece && <PromotionMenu promotionPiece={promotionPiece} onPromotionClick={onPromotionClick} />}
+        {displayPromotionMenu && promotionPiece && <PromotionMenu flip={flip} promotionPiece={promotionPiece} onPromotionClick={onPromotionClick} />}
       </Type>
     )
   })

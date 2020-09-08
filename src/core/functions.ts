@@ -13,7 +13,7 @@ export const getMoveNotationName = (move: HistoryMove): string => {
   const pieceNotationName = PieceNotationName[move.piece.type.toUpperCase() as keyof typeof PieceNotationName]
   const coords = xCoords[move.position.x] + (8 - move.position.y)
   const promotion = move.promotion ? "=" + PieceNotationName[move.promotion.toUpperCase() as keyof typeof PieceNotationName] : ""
-  const check = move.isEndMove ? "#" : move.isCheck ? "+" : ""
+  const check = move.isCheckmate ? "#" : move.isCheck ? "+" : ""
 
   if (move.piece.type === PieceTypes.PAWN && move.type === MoveTypes.CAPTURE)
     return xCoords[move.piece.position.x] + move.type + coords + promotion + check

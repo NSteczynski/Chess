@@ -1,8 +1,8 @@
 import { Settings, PlayerColor } from "./types"
 
 const DefaultSettings: Settings = {
-  hasStarted: false,
-  startPlayer: PlayerColor.WHITE,
+  startPlayer: PlayerColor.BLACK,
+  flip: true,
   score: {
     [PlayerColor.WHITE]: 0,
     [PlayerColor.BLACK]: 0

@@ -15,26 +15,15 @@ const App: React.FunctionComponent<{}> = () => {
   const [state, setState]  = React.useState<AppState>(DefaultAppState)
   const isBackwardDisabled = state.lastMove == undefined
   const isForwardDisabled  = !Object.keys(state.historyMoves).length || state.lastMove != undefined && state.lastMove.id === getLastObject(state.historyMoves).id
+  const showGameMenu = !Object.keys(state.historyMoves).length && !Object.keys(state.pieces).length || state.lastMove && state.lastMove.isCheckmate
 
   React.useEffect(() => {
-    if (!settings.hasStarted)
+    if (!Object.keys(state.historyMoves).length)
       return undefined
-
-    const secondPlayerColor = settings.startPlayer === PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE
-    const firstPlayer = createPlayerPieces(settings.startPlayer, 6, false)
-    const secondPlayer = createPlayerPieces(secondPlayerColor, 0, true)
-    return setState({ ...DefaultAppState, pieces: { ...firstPlayer, ...secondPlayer }, playerMove: settings.startPlayer })
-  }, [settings.hasStarted])
-
-  React.useEffect(() => {
-    const playerKing = state.pieces[Object.keys(state.pieces).find(key => state.pieces[key].type === PieceTypes.KING && state.pieces[key].color === state.playerMove) as string]
-    const oppositeColor = getOppositeColor(state.playerMove)
-    if (!Object.keys(state.pieces).length || Object.keys(getPieceMoves(playerKing, state.pieces)).length  || !isPositionAttacked(playerKing.position, oppositeColor, state.pieces))
-      return undefined
-
-    setState(prevState => ({ ...prevState, historyMoves: { ...prevState.historyMoves, [getLastObject(prevState.historyMoves).id]: { ...getLastObject(prevState.historyMoves), isEndMove: true } } }))
-    return setSettings(prevState => ({ ...prevState, hasStarted: false, startPlayer: state.playerMove, score: { ...prevState.score, [oppositeColor]: prevState.score[oppositeColor] + 1 } }))
-  }, [state.playerMove])
+    const color = getLastObject(state.historyMoves)?.isCheckmate ? getLastObject(state.historyMoves).piece.color : settings.startPlayer
+    const newScore = state.lastMove?.isCheckmate ? settings.score[color] + 1 : settings.score[color] - 1
+    return setSettings(prevState => ({ ...prevState, score: { ...prevState.score, [color]: newScore } }))
+  }, [state.lastMove != undefined && state.lastMove.isCheckmate])
 
   const createPlayerPieces = (color: PlayerColor, offsetY: number, switchRows: boolean): Dictionary<Piece> => {
     const pieces: Dictionary<Piece> = {}
@@ -55,7 +44,12 @@ const App: React.FunctionComponent<{}> = () => {
     return pieces
   }
 
-  const onGameStart = (): void => setSettings(prevState => ({ ...prevState, hasStarted: true }))
+  const onGameStart = (): void => {
+    const whitePlayer = createPlayerPieces(PlayerColor.WHITE, 6, false)
+    const blackPlayer = createPlayerPieces(PlayerColor.BLACK, 0, true)
+    setSettings(prevState => ({ ...prevState, startPlayer: getOppositeColor(prevState.startPlayer), flip: !prevState.flip }))
+    return setState({ ...DefaultAppState, pieces: { ...whitePlayer, ...blackPlayer }, playerMove: getOppositeColor(settings.startPlayer) })
+  }
 
   const onCellClick = (position: Vector): void => {
     if (state.promotionPiece != undefined)
@@ -91,13 +85,11 @@ const App: React.FunctionComponent<{}> = () => {
       pieces[getPositionName(move.position)] = { ...state.pieces[getPositionName(state.selected.position)], position: move.position, hasMoved: true }
 
     const nextMoves = getPieceMoves(pieces[getPositionName(move.position)], pieces, true)
-    const isCheck = !!Object.keys(nextMoves).find(key => {
-      const currPiece = pieces[getPositionName(nextMoves[key].position)]
-      if (currPiece == undefined)
-        return undefined
-      return currPiece.type === PieceTypes.KING
-    })
-    const historyMove = { id: HISTORY_MOVE_ID++, type: move.type, piece: state.selected, position: move.position, captured: move.captured, isCheck }
+    const enemyKing = pieces[Object.keys(pieces).find(key => pieces[key].type === PieceTypes.KING && pieces[key].color === getOppositeColor(pieces[getPositionName(move.position)].color)) as string]
+    const isCheck = Object.keys(nextMoves).find(key => pieces[getPositionName(nextMoves[key].position)] && pieces[getPositionName(nextMoves[key].position)].type === PieceTypes.KING) != undefined
+    const isCheckmate = !Object.keys(getPieceMoves(enemyKing, pieces)).length && isPositionAttacked(enemyKing.position, pieces[getPositionName(move.position)].color, pieces)
+
+    const historyMove = { id: HISTORY_MOVE_ID++, type: move.type, piece: state.selected, position: move.position, captured: move.captured, isCheck, isCheckmate }
     const prevHistoryMoves = state.lastMove == undefined ? {} : Object.keys(state.historyMoves).reduce((r, key) => {
       if (state.lastMove && state.historyMoves[key].id > state.lastMove.id)
         return r
@@ -106,7 +98,7 @@ const App: React.FunctionComponent<{}> = () => {
 
     return setState(prevState => ({
       ...prevState,
-      playerMove: prevState.playerMove === PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE,
+      playerMove: getOppositeColor(prevState.playerMove),
       pieces,
       selected: undefined,
       selectedMoves: {},
@@ -210,15 +202,16 @@ const App: React.FunctionComponent<{}> = () => {
   return (
     <React.Fragment>
       <div className="gameContainer">
-        <GameMenu {...settings} onGameStart={onGameStart} />
+        {showGameMenu && <GameMenu {...settings} onGameStart={onGameStart} />}
         <Board
           playerMove={state.playerMove}
           pieces={state.pieces}
+          flip={settings.flip}
           selectedPosition={state.selected && state.selected.position}
           selectedMoves={state.selectedMoves}
           lastMove={state.lastMove}
           promotionPiece={state.promotionPiece}
-          disabled={!settings.hasStarted || state.promotionPiece != undefined}
+          disabled={showGameMenu || state.promotionPiece != undefined}
           onCellClick={onCellClick}
           onPromotionClick={onPromotionClick}
         />
