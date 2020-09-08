@@ -1,4 +1,5 @@
-const HTMLWebpackPlugin = require('html-webpack-plugin')
+const CopyWebpackPlugin = require("copy-webpack-plugin")
+const HTMLWebpackPlugin = require("html-webpack-plugin")
 
 module.exports = {
   entry: './src/index.tsx',
@@ -32,6 +33,7 @@ module.exports = {
     historyApiFallback: true
   },
   plugins: [
+    new CopyWebpackPlugin({ patterns: [{ from: 'public' }]}),
     new HTMLWebpackPlugin({
       template: './public/index.html'
     })
