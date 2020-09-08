@@ -6,36 +6,61 @@
   margin-left: 25px;
   background: $container;
 
-  & > .movesHistory {
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
-    counter-reset: line;
-    max-height: 100%;
-    overflow-y: auto;
-
-    & > a {
-      position: relative;
+  & > .score {
+    padding: 15px 0px;
+    
+    & > p {
       display: flex;
-      justify-content: center;
-      padding: 5px 0px;
-      width: 50%;
-      color: $text;
-      font-size: 18px;
+      justify-content: space-between;
+      font-size: 26px;
+      padding: 0px 20px;
 
-      &:hover { cursor: pointer; }
-      &.active { font-weight: bold; }
-      &:nth-child(4n + 3), &:nth-child(4n + 4) { background: $lightContainer; }
-      &:nth-child(2n + 1) {
-        counter-increment: line;
+      & > span {
+        display: block;
+        width: 37.5%;
+        height: 30px;
 
-        &:before {
-          content: counter(line)".";
-          position: absolute;
-          font-weight: normal;
-          top: 0px;
-          left: 0px;
-          padding: 5px 10px;
+        &.white { background-color: $whitePiece; }
+        &.black { background-color: $blackPiece; }
+      }
+    }
+  }
+
+  & > .movesHistory {
+    height: 100%;
+    overflow-y: auto;
+    border-top: 1px solid $disabled;
+    border-bottom: 1px solid $disabled;
+
+    & > .moves {
+      display: flex;
+      flex-wrap: wrap;
+      flex-direction: row;
+      counter-reset: line;
+
+      & > a {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        padding: 5px 0px;
+        width: 50%;
+        color: $text;
+        font-size: 18px;
+
+        &:hover { cursor: pointer; }
+        &.active { font-weight: bold; }
+        &:nth-child(4n + 3), &:nth-child(4n + 4) { background: $lightContainer; }
+        &:nth-child(2n + 1) {
+          counter-increment: line;
+
+          &:before {
+            content: counter(line)".";
+            position: absolute;
+            font-weight: normal;
+            top: 0px;
+            left: 0px;
+            padding: 5px 10px;
+          }
         }
       }
     }
@@ -44,7 +69,6 @@
   & > .actions {
     display: flex;
     flex-direction: row;
-    margin-top: auto;
     width: 100%;
 
     & > button {

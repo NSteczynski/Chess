@@ -18,7 +18,9 @@ const MovesHistory: React.FunctionComponent<{
 
   return (
     <div className="movesHistory">
-      {movesInfo}
+      <div className="moves">
+        {movesInfo}
+      </div>
     </div>
   )
 }

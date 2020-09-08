@@ -224,6 +224,7 @@ const App: React.FunctionComponent<{}> = () => {
         />
       </div>
       <GameInformation
+        score={settings.score}
         historyMoves={state.historyMoves}
         lastMove={state.lastMove}
         isBackwardDisabled={isBackwardDisabled}

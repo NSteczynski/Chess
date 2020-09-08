@@ -1,8 +1,9 @@
 import React from "react"
 import MovesHistory from "./movesHistory"
-import { Dictionary, HistoryMove } from "../core/types"
+import { Dictionary, HistoryMove, EnumDictionary, PlayerColor } from "../core/types"
 
 const GameInformation: React.FunctionComponent<{
+  score: EnumDictionary<PlayerColor, number>
   historyMoves: Dictionary<HistoryMove>
   lastMove: HistoryMove | undefined
   isBackwardDisabled: boolean
@@ -10,8 +11,11 @@ const GameInformation: React.FunctionComponent<{
   onHistoryMoveClick: (move: HistoryMove) => void
   onBackwardHistoryClick: () => void
   onForwardHistoryClick: () => void
-}> = ({ historyMoves, lastMove, onHistoryMoveClick, isBackwardDisabled, isForwardDisabled, onBackwardHistoryClick, onForwardHistoryClick }) => (
+}> = ({ score, historyMoves, lastMove, onHistoryMoveClick, isBackwardDisabled, isForwardDisabled, onBackwardHistoryClick, onForwardHistoryClick }) => (
   <div className="gameInformation">
+    <div className="score">
+      <p><span className="white" /> {score[PlayerColor.WHITE]} - {score[PlayerColor.BLACK]} <span className="black" /></p>
+    </div>
     <MovesHistory
       moves={historyMoves}
       lastMove={lastMove}
