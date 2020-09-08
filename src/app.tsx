@@ -5,7 +5,7 @@ import GameInformation from "./components/gameInformation"
 import DefaultSettings from "./core/settings"
 import DefaultAppState from "./core/appstate"
 import getPieceMoves, { isPositionAttacked } from "./core/pieceMoves"
-import { getPositionName, getOppositeColor } from "./core/functions"
+import { getPositionName, getOppositeColor, getLastObject } from "./core/functions"
 import { Dictionary, Vector, Settings, AppState, Piece, HistoryMove, PlayerColor, PieceTypes, PieceMove, MoveTypes } from "./core/types"
 
 let HISTORY_MOVE_ID = 0
@@ -14,7 +14,7 @@ const App: React.FunctionComponent<{}> = () => {
   const [settings, setSettings] = React.useState<Settings>(DefaultSettings)
   const [state, setState]  = React.useState<AppState>(DefaultAppState)
   const isBackwardDisabled = state.lastMove == undefined
-  const isForwardDisabled  = !Object.keys(state.historyMoves).length || state.lastMove != undefined && state.lastMove.id === state.historyMoves[Object.keys(state.historyMoves)[Object.keys(state.historyMoves).length - 1]].id
+  const isForwardDisabled  = !Object.keys(state.historyMoves).length || state.lastMove != undefined && state.lastMove.id === getLastObject(state.historyMoves).id
 
   React.useEffect(() => {
     if (!settings.hasStarted)
@@ -32,6 +32,7 @@ const App: React.FunctionComponent<{}> = () => {
     if (!Object.keys(state.pieces).length || Object.keys(getPieceMoves(playerKing, state.pieces)).length  || !isPositionAttacked(playerKing.position, oppositeColor, state.pieces))
       return undefined
 
+    setState(prevState => ({ ...prevState, historyMoves: { ...prevState.historyMoves, [getLastObject(prevState.historyMoves).id]: { ...getLastObject(prevState.historyMoves), isEndMove: true } } }))
     return setSettings(prevState => ({ ...prevState, hasStarted: false, startPlayer: state.playerMove, score: { ...prevState.score, [oppositeColor]: prevState.score[oppositeColor] + 1 } }))
   }, [state.playerMove])
 

@@ -78,6 +78,8 @@ export interface HistoryMove {
   captured?: Piece
   /** Determines if move provides the check. */
   isCheck?: boolean
+  /** Determines if move ends game. */
+  isEndMove?: boolean
   /** The piece promotion. */
   promotion?: PieceTypes.ROOK | PieceTypes.BISHOP | PieceTypes.QUEEN
 }
