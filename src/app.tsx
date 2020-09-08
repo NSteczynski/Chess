@@ -13,8 +13,8 @@ let HISTORY_MOVE_ID = 0
 const App: React.FunctionComponent<{}> = () => {
   const [settings, setSettings] = React.useState<Settings>(DefaultSettings)
   const [state, setState]  = React.useState<AppState>(DefaultAppState)
-  const isBackwardDisabled = state.lastMove == undefined || state.lastMove.id === state.historyMoves[Object.keys(state.historyMoves)[0]].id
-  const isForwardDisabled  = state.lastMove == undefined || state.lastMove.id === state.historyMoves[Object.keys(state.historyMoves)[Object.keys(state.historyMoves).length - 1]].id
+  const isBackwardDisabled = state.lastMove == undefined
+  const isForwardDisabled  = !Object.keys(state.historyMoves).length || state.lastMove != undefined && state.lastMove.id === state.historyMoves[Object.keys(state.historyMoves)[Object.keys(state.historyMoves).length - 1]].id
 
   React.useEffect(() => {
     if (!settings.hasStarted)
@@ -130,12 +130,14 @@ const App: React.FunctionComponent<{}> = () => {
   }
 
   const onHistoryMoveClick = (move: HistoryMove): void => {
-    if (state.lastMove == undefined || move.id === state.lastMove.id)
+    if (state.lastMove != undefined && move.id === state.lastMove.id)
       return undefined
-    const reduceType = move.id > state.lastMove.id ? "reduce" : "reduceRight"
+    const reduceType = state.lastMove == undefined ? "reduce" : move.id > state.lastMove.id ? "reduce" : "reduceRight"
     const pieces = Object.keys(state.historyMoves)[reduceType]((r, key) => {
       const current = state.historyMoves[key]
-      if (state.lastMove == undefined || current == undefined)
+      if (state.lastMove == undefined && current.id <= move.id)
+        return forwardHistory(current, r)
+      if (state.lastMove == undefined)
         return r
       if (current.id >  move.id && current.id <= state.lastMove.id)
         return backwardHistory(current, r)
@@ -149,6 +151,8 @@ const App: React.FunctionComponent<{}> = () => {
 
   const onBackwardHistoryClick = (): void => {
     const historyMove = state.historyMoves[Object.keys(state.historyMoves).reverse().find(key => state.lastMove && state.historyMoves[key].id < state.lastMove.id) as string]
+    if (historyMove == undefined && state.lastMove != undefined)
+      return updateAfterHistoryChange(undefined, backwardHistory(state.lastMove, state.pieces))
     if (historyMove == undefined || state.lastMove == undefined)
       return undefined
     return updateAfterHistoryChange(historyMove, backwardHistory(state.lastMove, state.pieces))
@@ -156,15 +160,18 @@ const App: React.FunctionComponent<{}> = () => {
 
   const onForwardHistoryClick = (): void => {
     const historyMove = state.historyMoves[Object.keys(state.historyMoves).find(key => state.lastMove && state.historyMoves[key].id > state.lastMove.id) as string]
+    if (historyMove == undefined && state.lastMove == undefined && Object.keys(state.historyMoves))
+      return updateAfterHistoryChange(state.historyMoves[Object.keys(state.historyMoves)[0]], forwardHistory(state.historyMoves[Object.keys(state.historyMoves)[0]], state.pieces))
     if (historyMove == undefined || state.lastMove == undefined)
       return undefined
     return updateAfterHistoryChange(historyMove, forwardHistory(historyMove, state.pieces))
   }
 
-  const updateAfterHistoryChange = (move: HistoryMove, pieces: Dictionary<Piece>): void => {
+  const updateAfterHistoryChange = (move: HistoryMove | undefined, pieces: Dictionary<Piece>): void => {
+    const playerMove = move == undefined ? settings.startPlayer : move.piece.color === PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE
     return setState(prevState => ({
       ...prevState,
-      playerMove: move.piece.color === PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE,
+      playerMove,
       pieces,
       selectedMoves: {},
       selected: undefined,
