@@ -12,7 +12,9 @@ let HISTORY_MOVE_ID = 0
 
 const App: React.FunctionComponent<{}> = () => {
   const [settings, setSettings] = React.useState<Settings>(DefaultSettings)
-  const [state, setState] = React.useState<AppState>(DefaultAppState)
+  const [state, setState]  = React.useState<AppState>(DefaultAppState)
+  const isBackwardDisabled = state.lastMove == undefined || state.lastMove.id === state.historyMoves[Object.keys(state.historyMoves)[0]].id
+  const isForwardDisabled  = state.lastMove == undefined || state.lastMove.id === state.historyMoves[Object.keys(state.historyMoves)[Object.keys(state.historyMoves).length - 1]].id
 
   React.useEffect(() => {
     if (!settings.hasStarted)
@@ -142,6 +144,24 @@ const App: React.FunctionComponent<{}> = () => {
       return r
     }, { ...state.pieces })
 
+    return updateAfterHistoryChange(move, pieces)
+  }
+
+  const onBackwardHistoryClick = (): void => {
+    const historyMove = state.historyMoves[Object.keys(state.historyMoves).reverse().find(key => state.lastMove && state.historyMoves[key].id < state.lastMove.id) as string]
+    if (historyMove == undefined || state.lastMove == undefined)
+      return undefined
+    return updateAfterHistoryChange(historyMove, backwardHistory(state.lastMove, state.pieces))
+  }
+
+  const onForwardHistoryClick = (): void => {
+    const historyMove = state.historyMoves[Object.keys(state.historyMoves).find(key => state.lastMove && state.historyMoves[key].id > state.lastMove.id) as string]
+    if (historyMove == undefined || state.lastMove == undefined)
+      return undefined
+    return updateAfterHistoryChange(historyMove, forwardHistory(historyMove, state.pieces))
+  }
+
+  const updateAfterHistoryChange = (move: HistoryMove, pieces: Dictionary<Piece>): void => {
     return setState(prevState => ({
       ...prevState,
       playerMove: move.piece.color === PlayerColor.WHITE ? PlayerColor.BLACK : PlayerColor.WHITE,
@@ -155,28 +175,28 @@ const App: React.FunctionComponent<{}> = () => {
 
   const backwardHistory = (move: HistoryMove, pieces: Dictionary<Piece>): Dictionary<Piece> => {
     const temp = { ...pieces }
-    if (delete pieces[getPositionName(move.position)])
-      pieces[getPositionName(move.piece.position)] = { ...move.piece }
-    if (move.type === MoveTypes.Q_CASTLING && delete pieces[getPositionName({ x: 3, y: move.position.y })])
-      pieces[getPositionName({ x: 0, y: move.position.y })] = { ...temp[getPositionName({ x: 3, y: move.position.y })], position: { x: 0, y: move.position.y }, hasMoved: false }
-    if (move.type === MoveTypes.K_CASTLING && delete pieces[getPositionName({ x: 5, y: move.position.y })])
-      pieces[getPositionName({ x: 7, y: move.position.y })] = { ...temp[getPositionName({ x: 5, y: move.position.y })], position: { x: 7, y: move.position.y }, hasMoved: false }
+    if (delete temp[getPositionName(move.position)])
+      temp[getPositionName(move.piece.position)] = { ...move.piece }
+    if (move.type === MoveTypes.Q_CASTLING && delete temp[getPositionName({ x: 3, y: move.position.y })])
+      temp[getPositionName({ x: 0, y: move.position.y })] = { ...pieces[getPositionName({ x: 3, y: move.position.y })], position: { x: 0, y: move.position.y }, hasMoved: false }
+    if (move.type === MoveTypes.K_CASTLING && delete temp[getPositionName({ x: 5, y: move.position.y })])
+      temp[getPositionName({ x: 7, y: move.position.y })] = { ...pieces[getPositionName({ x: 5, y: move.position.y })], position: { x: 7, y: move.position.y }, hasMoved: false }
     if (move.captured)
-      pieces[getPositionName(move.captured.position)] = { ...move.captured }
-    return pieces
+      temp[getPositionName(move.captured.position)] = { ...move.captured }
+    return temp
   }
 
   const forwardHistory = (move: HistoryMove, pieces: Dictionary<Piece>): Dictionary<Piece> => {
     const temp = { ...pieces }
     if (move.captured)
-      delete pieces[getPositionName(move.captured.position)]
-    if (move.type === MoveTypes.Q_CASTLING && delete pieces[getPositionName({ x: 0, y: move.position.y })])
-      pieces[getPositionName({ x: 3, y: move.position.y })] = { ...temp[getPositionName({ x: 0, y: move.position.y })], position: { x: 3, y: move.position.y }, hasMoved: true }
-    if (move.type === MoveTypes.K_CASTLING && delete pieces[getPositionName({ x: 7, y: move.position.y })])
-      pieces[getPositionName({ x: 5, y: move.position.y })] = { ...temp[getPositionName({ x: 7, y: move.position.y })], position: { x: 5, y: move.position.y }, hasMoved: true }
-    if (delete pieces[getPositionName(move.piece.position)])
-      pieces[getPositionName(move.position)] = { ...move.piece, type: move.promotion ? move.promotion: move.piece.type, position: move.position, hasMoved: true }
-    return pieces
+      delete temp[getPositionName(move.captured.position)]
+    if (move.type === MoveTypes.Q_CASTLING && delete temp[getPositionName({ x: 0, y: move.position.y })])
+      temp[getPositionName({ x: 3, y: move.position.y })] = { ...pieces[getPositionName({ x: 0, y: move.position.y })], position: { x: 3, y: move.position.y }, hasMoved: true }
+    if (move.type === MoveTypes.K_CASTLING && delete temp[getPositionName({ x: 7, y: move.position.y })])
+      temp[getPositionName({ x: 5, y: move.position.y })] = { ...pieces[getPositionName({ x: 7, y: move.position.y })], position: { x: 5, y: move.position.y }, hasMoved: true }
+    if (delete temp[getPositionName(move.piece.position)])
+      temp[getPositionName(move.position)] = { ...move.piece, type: move.promotion ? move.promotion: move.piece.type, position: move.position, hasMoved: true }
+    return temp
   }
 
   return (
@@ -196,7 +216,11 @@ const App: React.FunctionComponent<{}> = () => {
       <GameInformation
         historyMoves={state.historyMoves}
         lastMove={state.lastMove}
+        isBackwardDisabled={isBackwardDisabled}
+        isForwardDisabled={isForwardDisabled}
         onHistoryMoveClick={onHistoryMoveClick}
+        onBackwardHistoryClick={onBackwardHistoryClick}
+        onForwardHistoryClick={onForwardHistoryClick}
       />
     </React.Fragment>
   )
