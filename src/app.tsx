@@ -20,9 +20,9 @@ const App: React.FunctionComponent<{}> = () => {
   React.useEffect(() => {
     if (!Object.keys(state.historyMoves).length)
       return undefined
-    const color = getLastObject(state.historyMoves)?.isCheckmate ? getLastObject(state.historyMoves).piece.color : settings.startPlayer
-    const newScore = state.lastMove?.isCheckmate ? settings.score[color] + 1 : settings.score[color] - 1
-    return setSettings(prevState => ({ ...prevState, score: { ...prevState.score, [color]: newScore } }))
+    const color = getLastObject(state.historyMoves)?.isCheckmate ? getLastObject(state.historyMoves).piece.color : PlayerColor.WHITE
+    const newScore = state.lastMove?.isCheckmate ? settings.score[color].value + 1 : settings.score[color].value - 1
+    return setSettings(prevState => ({ ...prevState, score: { ...prevState.score, [color]: { ...prevState.score[color], value: newScore } } }))
   }, [state.lastMove != undefined && state.lastMove.isCheckmate])
 
   const createPlayerPieces = (color: PlayerColor, offsetY: number, switchRows: boolean): Dictionary<Piece> => {
@@ -47,8 +47,9 @@ const App: React.FunctionComponent<{}> = () => {
   const onGameStart = (): void => {
     const whitePlayer = createPlayerPieces(PlayerColor.WHITE, 6, false)
     const blackPlayer = createPlayerPieces(PlayerColor.BLACK, 0, true)
-    setSettings(prevState => ({ ...prevState, startPlayer: getOppositeColor(prevState.startPlayer), flip: !prevState.flip }))
-    return setState({ ...DefaultAppState, pieces: { ...whitePlayer, ...blackPlayer }, playerMove: getOppositeColor(settings.startPlayer) })
+    if (settings.score[PlayerColor.WHITE].value > 0 || settings.score[PlayerColor.BLACK].value > 0)
+      setSettings(prevState => ({ ...prevState, flip: !prevState.flip }))
+    return setState({ ...DefaultAppState, pieces: { ...whitePlayer, ...blackPlayer }, playerMove: PlayerColor.WHITE })
   }
 
   const onCellClick = (position: Vector): void => {
@@ -161,7 +162,7 @@ const App: React.FunctionComponent<{}> = () => {
   }
 
   const updateAfterHistoryChange = (move: HistoryMove | undefined, pieces: Dictionary<Piece>): void => {
-    const playerMove = move == undefined ? settings.startPlayer : getOppositeColor(move.piece.color)
+    const playerMove = move == undefined ? PlayerColor.WHITE : getOppositeColor(move.piece.color)
     return setState(prevState => ({
       ...prevState,
       playerMove,
@@ -218,6 +219,7 @@ const App: React.FunctionComponent<{}> = () => {
       </div>
       <GameInformation
         score={settings.score}
+        flip={settings.flip}
         historyMoves={state.historyMoves}
         lastMove={state.lastMove}
         isBackwardDisabled={isBackwardDisabled}

@@ -1,14 +1,19 @@
 import React from "react"
+import PlayerName from "./playerName"
 import { Settings, PlayerColor } from "../core/types"
 
 const GameMenu: React.FunctionComponent<{
   onGameStart: () => void
-} & Settings> = ({ score, onGameStart }) => (
+} & Settings> = ({ score, flip, onGameStart }) => (
   <div className="gameMenu">
     <div className="container">
       <h2>Game Menu</h2>
       <div className="score">
-        <p><span className="white" /> {score[PlayerColor.WHITE]} - {score[PlayerColor.BLACK]} <span className="black" /></p>
+        <p>
+          <PlayerName name={score[PlayerColor.WHITE].name} color={PlayerColor.WHITE} flip={flip} />
+          {score[PlayerColor.WHITE].value} - {score[PlayerColor.BLACK].value}
+          <PlayerName name={score[PlayerColor.BLACK].name} color={PlayerColor.BLACK} flip={flip} />
+        </p>
       </div>
       <button onClick={onGameStart}>Start Game</button>
     </div>

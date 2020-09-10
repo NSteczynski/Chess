@@ -14,12 +14,18 @@ export interface Vector {
 
 /** The game settings. */
 export interface Settings {
-  /** Determines which player starts the game. */
-  startPlayer: PlayerColor
-  /** Determines if board pieces should be flipped in y-axis. */
+  /** Determines if players should change colors. */
   flip: boolean
   /** The game score. */
-  score: EnumDictionary<PlayerColor, number>
+  score: EnumDictionary<PlayerColor, Score>
+}
+
+/** The game score. */
+export interface Score {
+  /** The player name of the score. */
+  name: string
+  /** The score value. */
+  value: number
 }
 
 /** The app state. */

@@ -1,8 +1,7 @@
-import DefaultSettings from "./settings";
-import { AppState } from "./types";
+import { AppState, PlayerColor } from "./types";
 
 const DefaultAppState: AppState = {
-  playerMove: DefaultSettings.startPlayer,
+  playerMove: PlayerColor.WHITE,
   pieces: {},
   selected: undefined,
   selectedMoves: {},

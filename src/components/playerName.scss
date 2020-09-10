@@ -1,0 +1,12 @@
+.playerName {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 37.5%;
+  height: 40px;
+  padding: 5px;
+
+  & > span { color: inherit; word-break: break-word; }
+  &.white { background-color: $whitePiece; color: $background; }
+  &.black { background-color: $blackPiece; color: $text; }
+}

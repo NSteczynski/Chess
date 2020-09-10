@@ -1,11 +1,10 @@
 import { Settings, PlayerColor } from "./types"
 
 const DefaultSettings: Settings = {
-  startPlayer: PlayerColor.BLACK,
-  flip: true,
+  flip: false,
   score: {
-    [PlayerColor.WHITE]: 0,
-    [PlayerColor.BLACK]: 0
+    [PlayerColor.WHITE]: { name: "Player1", value: 0 },
+    [PlayerColor.BLACK]: { name: "Player2", value: 0 }
   }
 }
 
