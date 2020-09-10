@@ -87,7 +87,7 @@ const App: React.FunctionComponent<{}> = () => {
     const nextMoves = getPieceMoves(pieces[getPositionName(move.position)], pieces, true)
     const enemyKing = pieces[Object.keys(pieces).find(key => pieces[key].type === PieceTypes.KING && pieces[key].color === getOppositeColor(pieces[getPositionName(move.position)].color)) as string]
     const isCheck = Object.keys(nextMoves).find(key => pieces[getPositionName(nextMoves[key].position)] && pieces[getPositionName(nextMoves[key].position)].type === PieceTypes.KING) != undefined
-    const isCheckmate = !Object.keys(getPieceMoves(enemyKing, pieces)).length && isPositionAttacked(enemyKing.position, pieces[getPositionName(move.position)].color, pieces)
+    const isCheckmate = !Object.keys(getPieceMoves(enemyKing, pieces)).length && isPositionAttacked(enemyKing.position, pieces[getPositionName(move.position)].color, pieces) && !isPositionAttacked(move.position, getOppositeColor(pieces[getPositionName(move.position)].color), pieces)
 
     const historyMove = { id: HISTORY_MOVE_ID++, type: move.type, piece: state.selected, position: move.position, captured: move.captured, isCheck, isCheckmate }
     const prevHistoryMoves = state.lastMove == undefined ? {} : Object.keys(state.historyMoves).reduce((r, key) => {
