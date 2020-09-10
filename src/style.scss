@@ -13,7 +13,6 @@ body {
   padding: 0px;
   width: 100vw;
   height: 100vh;
-  overflow: hidden;
   background: $background;
   transition: none;
 
@@ -23,12 +22,20 @@ body {
     align-items: center;
     justify-content: center;
     width: 100vw;
-    height: 100vh;
+    min-height: 100vh;
+
+    @media only screen and (max-width: 768px ) { flex-direction: column; margin: 15px 0px; }
 
     & > .gameContainer {
       position: relative;
       width: 800px;
       height: 800px;
+      
+      @media only screen and (max-width: 1150px) { width: 700px; height: 700px; }
+      @media only screen and (max-width: 1025px) { width: 600px; height: 600px; }
+      @media only screen and (max-width: 900px ) { width: 500px; height: 500px; }
+      @media only screen and (max-width: 525px ) { width: 400px; height: 400px; }
+      @media only screen and (max-width: 425px ) { width: 300px; height: 300px; }
     }
   }
 }

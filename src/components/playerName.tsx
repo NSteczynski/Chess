@@ -7,28 +7,56 @@ const PlayerName: React.FunctionComponent<{
   color: PlayerColor
   flip: boolean
 }> = ({ name, color, flip }) => {
-  const [fontSize, setFontSize] = React.useState<number>(26)
+  const [fontSize, setFontSize] = React.useState<number>(0)
   const container = React.useRef<HTMLSpanElement>(null)
-  const text = React.useRef<HTMLSpanElement>(null)
   const className = "playerName " + (flip ? getOppositeColor(color) : color)
 
   React.useEffect(() => {
-    if (text.current == undefined || container.current == undefined)
-      return undefined
+    window.addEventListener("resize", () => setFontSize(changeFontSize()))
+    return window.removeEventListener("resize", () => setFontSize(changeFontSize()))
+  }, [])
 
-    const containerWidth  = container.current.getBoundingClientRect().width  - 10
-    const containerHeight = container.current.getBoundingClientRect().height - 10
-    const textWidth  = text.current.getBoundingClientRect().width
-    const textHeight = text.current.getBoundingClientRect().height
-
-    if (textWidth <= containerWidth && textHeight <= containerHeight)
-      return undefined
-    return setFontSize(fontSize - 1)
+  React.useEffect(() => {
+    return setFontSize(changeFontSize())
   }, [name, fontSize])
+
+  const changeFontSize = (initial: number = 1, isMax?: boolean): number => {
+    if (container.current == undefined || isMax)
+      return initial
+
+    const wrapper   = document.createElement("span")
+    const localSpan = document.createElement("span")
+    const localText = document.createTextNode(name)
+
+    wrapper.style.position = "absolute"
+    wrapper.style.opacity  = "0"
+    wrapper.style.width    = "100%"
+    wrapper.style.height   = "100%"
+    wrapper.style.padding  = "10px"
+    localSpan.style.fontSize  = initial + "px"
+    localSpan.style.wordBreak = "break-word"
+
+    localSpan.append(localText)
+    wrapper.append(localSpan)
+    container.current.append(wrapper)
+
+    const containerWidth  = wrapper.getBoundingClientRect().width
+    const containerHeight = wrapper.getBoundingClientRect().height
+    const textElementWidth  = localSpan.getBoundingClientRect().width
+    const textElementHeight = localSpan.getBoundingClientRect().height
+
+    wrapper.remove()
+    localText.remove()
+    localSpan.remove()
+
+    if (textElementWidth > containerWidth || textElementHeight > containerHeight)
+      return changeFontSize(initial - 1, true)
+    return changeFontSize(initial + 1)
+  }
 
   return (
     <span ref={container} className={className}>
-      <span style={{ fontSize }} ref={text}>{name}</span>
+      <span style={{ fontSize }}>{name}</span>
     </span>
   )
 }

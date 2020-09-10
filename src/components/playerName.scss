@@ -1,10 +1,18 @@
 .playerName {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 37.5%;
   height: 40px;
   padding: 5px;
+
+  @media only screen and (max-width: 1150px) { height: 37.5px; }
+  @media only screen and (max-width: 1025px) { height: 35.0px; }
+  @media only screen and (max-width: 900px ) { height: 32.5px; }
+  @media only screen and (max-width: 768px ) { height: 27.5px; }
+  @media only screen and (max-width: 525px ) { height: 25.0px; }
+  @media only screen and (max-width: 425px ) { height: 22.5px; }
 
   & > span { color: inherit; word-break: break-word; }
   &.white { background-color: $whitePiece; color: $background; }

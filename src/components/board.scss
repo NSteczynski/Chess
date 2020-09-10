@@ -43,6 +43,12 @@
         width: 100%;
         height: 100%;
 
+        @media only screen and (max-width: 1150px) { font-size: 4.4em; -webkit-text-stroke-width: 2.5px; }
+        @media only screen and (max-width: 1025px) { font-size: 3.8em; -webkik-text-stroke-width: 2.0px; }
+        @media only screen and (max-width: 900px ) { font-size: 3.2em; -webkit-text-stroke-width: 1.5px; }
+        @media only screen and (max-width: 525px ) { font-size: 2.6em; -webkit-text-stroke-width: 1.0px; }
+        @media only screen and (max-width: 425px ) { font-size: 2.0em; -webkit-text-stroke-width: 0.5px; }
+
         &:hover { cursor: pointer; }
         &.black > i:before { color: $blackPiece; font-family: inherit; }
         &.white > i:before { color: $whitePiece; font-family: inherit; }

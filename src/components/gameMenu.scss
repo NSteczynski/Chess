@@ -22,6 +22,13 @@
       font-size: 34px;
       padding: 10px;
       text-align: center;
+
+      @media only screen and (max-width: 1150px) { font-size: 32px; }
+      @media only screen and (max-width: 1025px) { font-size: 30px; }
+      @media only screen and (max-width: 900px ) { font-size: 28px; }
+      @media only screen and (max-width: 768px ) { font-size: 26px; }
+      @media only screen and (max-width: 525px ) { font-size: 22px; }
+      @media only screen and (max-width: 425px ) { font-size: 16px; }
     }
 
     & > .score > p {
@@ -29,15 +36,28 @@
       justify-content: space-between;
       align-items: center;
       font-size: 26px;
-      padding: 0px 20px;
+
+      @media only screen and (max-width: 1150px) { font-size: 25px; }
+      @media only screen and (max-width: 1025px) { font-size: 22px; }
+      @media only screen and (max-width: 900px ) { font-size: 18px; }
+      @media only screen and (max-width: 768px ) { font-size: 14px; }
+      @media only screen and (max-width: 525px ) { font-size: 12px; }
+      @media only screen and (max-width: 425px ) { font-size: 10px; }
     }
 
     & > button {
-      font-size: 18px;
+      font-size: 20px;
       padding: 10px;
       place-self: flex-end;
       margin-top: auto;
       background: $container;
+
+      @media only screen and (max-width: 1150px) { font-size: 18px; }
+      @media only screen and (max-width: 1025px) { font-size: 16px; }
+      @media only screen and (max-width: 900px ) { font-size: 14px; }
+      @media only screen and (max-width: 768px ) { font-size: 13px; padding: 5px; }
+      @media only screen and (max-width: 525px ) { font-size: 12px; }
+      @media only screen and (max-width: 425px ) { font-size: 10px; }
 
       &:hover {
         cursor: pointer;
