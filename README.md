@@ -32,3 +32,4 @@ $ npm start
 ![preview](https://github.com/NSteczynski/Chess/blob/master/screenshots/chess1.png?raw=true)
 ![preview](https://github.com/NSteczynski/Chess/blob/master/screenshots/chess2.png?raw=true)
 ![preview](https://github.com/NSteczynski/Chess/blob/master/screenshots/chess3.png?raw=true)
+![preview](https://github.com/NSteczynski/Chess/blob/master/screenshots/chess4.png?raw=true)
