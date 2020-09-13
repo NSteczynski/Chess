@@ -4,10 +4,10 @@ import { Settings, PlayerColor } from "../core/types"
 
 const GameMenu: React.FunctionComponent<{
   onGameStart: () => void
-} & Settings> = ({ score, flip, onGameStart }) => (
+} & Settings> = ({ score, flip, winPlayer, onGameStart }) => (
   <div className="gameMenu">
     <div className="container">
-      <h2>Game Menu</h2>
+      <h2>{winPlayer ? `${score[winPlayer].name} has won!` : "Game Menu"}</h2>
       <div className="score">
         <p>
           <PlayerName name={score[PlayerColor.WHITE].name} color={PlayerColor.WHITE} flip={flip} />

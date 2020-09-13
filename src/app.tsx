@@ -15,14 +15,14 @@ const App: React.FunctionComponent<{}> = () => {
   const [state, setState]  = React.useState<AppState>(DefaultAppState)
   const isBackwardDisabled = state.lastMove == undefined
   const isForwardDisabled  = !Object.keys(state.historyMoves).length || state.lastMove != undefined && state.lastMove.id === getLastObject(state.historyMoves).id
-  const showGameMenu = !Object.keys(state.historyMoves).length && !Object.keys(state.pieces).length || state.lastMove && state.lastMove.isCheckmate
 
   React.useEffect(() => {
     if (!Object.keys(state.historyMoves).length)
       return undefined
     const color = getLastObject(state.historyMoves)?.isCheckmate ? getLastObject(state.historyMoves).piece.color : PlayerColor.WHITE
     const newScore = state.lastMove?.isCheckmate ? settings.score[color].value + 1 : settings.score[color].value - 1
-    return setSettings(prevState => ({ ...prevState, score: { ...prevState.score, [color]: { ...prevState.score[color], value: newScore } } }))
+    const winPlayer = state.lastMove?.isCheckmate ? color : undefined
+    return setSettings(prevState => ({ ...prevState, score: { ...prevState.score, [color]: { ...prevState.score[color], value: newScore } }, winPlayer }))
   }, [state.lastMove != undefined && state.lastMove.isCheckmate])
 
   const createPlayerPieces = (color: PlayerColor, offsetY: number, switchRows: boolean): Dictionary<Piece> => {
@@ -48,7 +48,7 @@ const App: React.FunctionComponent<{}> = () => {
     const whitePlayer = createPlayerPieces(PlayerColor.WHITE, 6, false)
     const blackPlayer = createPlayerPieces(PlayerColor.BLACK, 0, true)
     if (settings.score[PlayerColor.WHITE].value > 0 || settings.score[PlayerColor.BLACK].value > 0)
-      setSettings(prevState => ({ ...prevState, flip: !prevState.flip }))
+      setSettings(prevState => ({ ...prevState, flip: !prevState.flip, winPlayer: undefined }))
     return setState({ ...DefaultAppState, pieces: { ...whitePlayer, ...blackPlayer }, playerMove: PlayerColor.WHITE })
   }
 
@@ -203,7 +203,7 @@ const App: React.FunctionComponent<{}> = () => {
   return (
     <React.Fragment>
       <div className="gameContainer">
-        {showGameMenu && <GameMenu {...settings} onGameStart={onGameStart} />}
+        {(settings.winPlayer || !Object.keys(state.pieces).length) && <GameMenu {...settings} onGameStart={onGameStart} />}
         <Board
           playerMove={state.playerMove}
           pieces={state.pieces}
@@ -212,7 +212,7 @@ const App: React.FunctionComponent<{}> = () => {
           selectedMoves={state.selectedMoves}
           lastMove={state.lastMove}
           promotionPiece={state.promotionPiece}
-          disabled={showGameMenu || state.promotionPiece != undefined}
+          disabled={settings.winPlayer != undefined || state.promotionPiece != undefined}
           onCellClick={onCellClick}
           onPromotionClick={onPromotionClick}
         />

@@ -18,6 +18,8 @@ export interface Settings {
   flip: boolean
   /** The game score. */
   score: EnumDictionary<PlayerColor, Score>
+  /** The player that has won. */
+  winPlayer?: PlayerColor
 }
 
 /** The game score. */
