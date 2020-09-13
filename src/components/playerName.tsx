@@ -49,7 +49,7 @@ const PlayerName: React.FunctionComponent<{
     localText.remove()
     localSpan.remove()
 
-    if (textElementWidth > containerWidth || textElementHeight > containerHeight)
+    if (textElementWidth > containerWidth || textElementHeight > containerHeight || initial > 28)
       return changeFontSize(initial - 1, true)
     return changeFontSize(initial + 1)
   }

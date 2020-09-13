@@ -19,16 +19,16 @@
     background: $background;
 
     & > h2 {
-      font-size: 34px;
+      font-size: 30px;
       padding: 10px;
       text-align: center;
 
-      @media only screen and (max-width: 1150px) { font-size: 32px; }
-      @media only screen and (max-width: 1025px) { font-size: 30px; }
-      @media only screen and (max-width: 900px ) { font-size: 28px; }
-      @media only screen and (max-width: 768px ) { font-size: 26px; }
-      @media only screen and (max-width: 525px ) { font-size: 22px; }
-      @media only screen and (max-width: 425px ) { font-size: 16px; }
+      @media only screen and (max-width: 1150px) { font-size: 28px; }
+      @media only screen and (max-width: 1025px) { font-size: 26px; }
+      @media only screen and (max-width: 900px ) { font-size: 24px; }
+      @media only screen and (max-width: 768px ) { font-size: 22px; }
+      @media only screen and (max-width: 525px ) { font-size: 18px; }
+      @media only screen and (max-width: 425px ) { font-size: 14px; }
     }
 
     & > .score > p {
@@ -45,23 +45,30 @@
       @media only screen and (max-width: 425px ) { font-size: 10px; }
     }
 
-    & > button {
-      font-size: 20px;
-      padding: 10px;
-      place-self: flex-end;
+    & > .actions {
+      display: flex;
+      justify-content: flex-end;
       margin-top: auto;
-      background: $container;
 
-      @media only screen and (max-width: 1150px) { font-size: 18px; }
-      @media only screen and (max-width: 1025px) { font-size: 16px; }
-      @media only screen and (max-width: 900px ) { font-size: 14px; }
-      @media only screen and (max-width: 768px ) { font-size: 13px; padding: 5px; }
-      @media only screen and (max-width: 525px ) { font-size: 12px; }
-      @media only screen and (max-width: 425px ) { font-size: 10px; }
+      & > button {
+        font-size: 20px;
+        padding: 10px;
+        place-self: flex-end;
+        margin-top: auto;
+        background: $container;
 
-      &:hover {
-        cursor: pointer;
-        background: $lightContainer;
+        @media only screen and (max-width: 1150px) { font-size: 18px; }
+        @media only screen and (max-width: 1025px) { font-size: 16px; }
+        @media only screen and (max-width: 900px ) { font-size: 14px; }
+        @media only screen and (max-width: 768px ) { font-size: 13px; padding: 5px; }
+        @media only screen and (max-width: 525px ) { font-size: 12px; }
+        @media only screen and (max-width: 425px ) { font-size: 10px; }
+
+        &:not(:first-child) { margin-left: 10px; }
+        &:hover {
+          cursor: pointer;
+          background: $lightContainer;
+        }
       }
     }
   }

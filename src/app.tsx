@@ -44,7 +44,15 @@ const App: React.FunctionComponent<{}> = () => {
     return pieces
   }
 
-  const onGameStart = (): void => {
+  const onNewGame = (): void => {
+    const whitePlayer = createPlayerPieces(PlayerColor.WHITE, 6, false)
+    const blackPlayer = createPlayerPieces(PlayerColor.BLACK, 0, true)
+    if (settings.score[PlayerColor.WHITE].value > 0 || settings.score[PlayerColor.BLACK].value > 0)
+      setSettings(DefaultSettings)
+    return setState({ ...DefaultAppState, pieces: { ...whitePlayer, ...blackPlayer }, playerMove: PlayerColor.WHITE })
+  }
+
+  const onGameRematch = (): void => {
     const whitePlayer = createPlayerPieces(PlayerColor.WHITE, 6, false)
     const blackPlayer = createPlayerPieces(PlayerColor.BLACK, 0, true)
     if (settings.score[PlayerColor.WHITE].value > 0 || settings.score[PlayerColor.BLACK].value > 0)
@@ -203,7 +211,7 @@ const App: React.FunctionComponent<{}> = () => {
   return (
     <React.Fragment>
       <div className="gameContainer">
-        {(settings.winPlayer || !Object.keys(state.pieces).length) && <GameMenu {...settings} onGameStart={onGameStart} />}
+        {(settings.winPlayer || !Object.keys(state.pieces).length) && <GameMenu {...settings} onNewGame={onNewGame} onGameRematch={onGameRematch} />}
         <Board
           playerMove={state.playerMove}
           pieces={state.pieces}
