@@ -179,7 +179,7 @@ const Game: React.FunctionComponent<{
 
   const onResignationClick = (): void => {
     onSettingsChange("showGameMenu", true)
-    return setState(prevState => ({ ...prevState, resignPlayer: prevState.playerMove }))
+    return setState(prevState => ({ ...prevState, resignPlayer: settings.flip ? GetOppositeColor(prevState.playerMove) : prevState.playerMove }))
   }
 
   return (
