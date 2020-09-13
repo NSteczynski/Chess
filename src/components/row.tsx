@@ -1,6 +1,6 @@
 import React from "react"
 import PromotionMenu from "./promotionMenu"
-import { getPositionName } from "../core/functions"
+import { getPositionName, xCoords as getxCoords } from "../core/functions"
 import { Dictionary, Vector, Piece, HistoryMove, PieceMove, PieceTypes, PlayerColor } from "../core/types"
 
 const Row: React.FunctionComponent<{
@@ -25,11 +25,15 @@ const Row: React.FunctionComponent<{
     const className = "cell " + ((id + x) % 2 === 0 ? "even" : "odd") + (isMove ? " move" : "") + (isSelected || isLastMove ? " selected" : "")
     const displayPromotionMenu = promotionPiece && promotionPiece.position.x === cellPosition.x && promotionPiece.position.y === cellPosition.y
     const Type = isMove || current && !disabled && current.color === playerMove ? "a" : "div"
+    const xCoords = cellPosition.y === 7 ? getxCoords[cellPosition.x] : undefined
+    const yCoords = cellPosition.x === 0 ? 7 - cellPosition.y + 1     : undefined
 
     return (
       <Type key={x} className={className} onClick={() => onCellClick(cellPosition)}>
         {current && <span className={`piece ${current.color}`}><i className={`fas fa-chess-${current.type}`} /></span>}
         {displayPromotionMenu && promotionPiece && <PromotionMenu flip={flip} promotionPiece={promotionPiece} onPromotionClick={onPromotionClick} />}
+        {xCoords != undefined && <span className="xCoords">{xCoords}</span>}
+        {yCoords != undefined && <span className="yCoords">{yCoords}</span>}
       </Type>
     )
   })

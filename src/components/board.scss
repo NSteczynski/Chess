@@ -17,6 +17,8 @@
 
       &.even { background: $even; }
       &.odd { background: $odd; }
+      &.even > span { color: $odd; }
+      &.odd > span { color: $even; }
       &.selected.even { background: $selectedEven; }
       &.selected.odd { background: $selectedOdd; }
       &.move:after {
@@ -33,6 +35,22 @@
 
       &:not(a) > .piece:hover { cursor: auto; }
       &.move:hover { cursor: pointer; }
+
+      & > span {
+        position: absolute;
+        font-size: 20px;
+        font-weight: bold;
+        padding: 5px;
+
+        @media only screen and (max-width: 1150px) { font-size: 18px; padding: 3.0px; }
+        @media only screen and (max-width: 1025px) { font-size: 16px; padding: 2.5px; }
+        @media only screen and (max-width: 900px ) { font-size: 14px; padding: 2.0px; }
+        @media only screen and (max-width: 525px ) { font-size: 12px; padding: 1.0px; }
+        @media only screen and (max-width: 425px ) { font-size: 10px; padding: 0.5px; }
+
+        &.xCoords { bottom: 0px; right: 0px; }
+        &.yCoords { top: 0px; left: 0px; }
+      }
 
       & > .piece {
         display: flex;
