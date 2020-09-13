@@ -1,0 +1,12 @@
+.game {
+  position: relative;
+  width: 800px;
+  height: 800px;
+  border: 1px solid $disabled;
+  
+  @media only screen and (max-width: 1150px) { width: 700px; height: 700px; }
+  @media only screen and (max-width: 1025px) { width: 600px; height: 600px; }
+  @media only screen and (max-width: 900px ) { width: 500px; height: 500px; }
+  @media only screen and (max-width: 525px ) { width: 400px; height: 400px; }
+  @media only screen and (max-width: 425px ) { width: 300px; height: 300px; }
+}

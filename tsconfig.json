@@ -1,14 +1,20 @@
 {
   "compilerOptions": {
-    "module": "CommonJS",
-    "target": "ES6",
-    "sourceMap": true,
-    "jsx": "react",
-    "moduleResolution": "node",
     "preserveConstEnums": true,
-    "removeComments": true,
-    "strictNullChecks": true,
-    "noImplicitAny": true,
-    "esModuleInterop": true
+    "strictNullChecks":   true,
+    "esModuleInterop":    true,
+    "removeComments":     true,
+    "noImplicitAny":      true,
+    "sourceMap":          true,
+    "moduleResolution":  "node",
+    "baseUrl":           "./",
+    "module":            "CommonJS",
+    "target":            "ES6",
+    "jsx":               "react",
+    "paths": {
+      "@components/*": ["src/components/*"],
+      "@core/*":       ["src/core/*"],
+      "@app/*":        ["src/*"]
+    }
   }
 }

@@ -1,15 +1,22 @@
-$background: #212121;
-$container: #2a2a2a;
-$lightContainer: #313131;
-$text: #ffffff;
-$disabled: #454545;
+/** Colors from my Xresources file: https://github.com/NSteczynski/Dotfiles/blob/master/.Xresources */
+$backgroundLight:   #282828;
+$backgroundLighter: #313131;
+$background: #1d2021;
+$foreground: #d4be98;
+$disabled:   #454545;
 
-$even: #769656;
-$odd: #eeeed2;
-$selectedOdd: #f7f783;
-$selectedEven: #bacb44;
-$move: #000000aa;
+$red:     #ea6962;
+$green:   #a9b665;
+$yellow:  #d8a657;
+$blue:    #7daea3;
+$magenta: #d3869b;
+$cyan:    #89b482;
 
-$whitePiece: #f8f8f8;
-$blackPiece: #565352;
-$pieceOutline: #262626;
+$fade: rgba($background, 0.75);
+$even: lighten($foreground, 15%);
+$odd:  darken( $cyan      , 15%);
+
+$selectedOdd:  lighten($yellow, 2.5%);
+$selectedEven: lighten($yellow, 7.5%);
+$whitePlayer:  lighten($foreground, 15%);
+$blackPlayer:  lighten($background, 15%);

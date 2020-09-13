@@ -3,7 +3,7 @@ import { Piece, PieceTypes } from "../core/types"
 
 const PromotionMenu: React.FunctionComponent<{
   promotionPiece: Piece
-  flip: boolean
+  flip:           boolean
   onPromotionClick: (piece: Piece, type: PieceTypes.ROOK | PieceTypes.BISHOP | PieceTypes.QUEEN) => void
 }> = ({ promotionPiece, flip, onPromotionClick }) => (
   <div className={`promotionMenu ${promotionPiece.color}${flip ? " flip" : ""}`}>

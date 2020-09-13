@@ -1,16 +1,16 @@
 import React from "react"
-import {getOppositeColor} from "../core/functions"
-import { PlayerColor } from "../core/types"
+import { PlayerColor }      from "@core/types"
+import { GetOppositeColor } from "@core/functions"
 
 const PlayerName: React.FunctionComponent<{
-  name: string
+  name:  string
+  flip:  boolean
   color: PlayerColor
-  flip: boolean
   onChange?: (name: string, color: PlayerColor) => void
-}> = ({ name, color, flip, onChange }) => {
+}> = ({ name, flip, color, onChange }) => {
   const [fontSize, setFontSize] = React.useState<number>(0)
   const container = React.useRef<HTMLSpanElement>(null)
-  const className = "playerName " + (flip ? getOppositeColor(color) : color)
+  const className = "playerName " + (flip ? GetOppositeColor(color) : color)
 
   React.useEffect(() => {
     window.addEventListener("resize", () => setFontSize(changeFontSize(fontSize)))

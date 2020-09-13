@@ -30,7 +30,7 @@
         width: 30%;
         height: 30%;
         border-radius: 100%;
-        background: $move;
+        background: $fade;
       }
 
       &:not(a) > .piece:hover { cursor: auto; }
@@ -57,7 +57,7 @@
         justify-content: center;
         align-items: center;
         font-size: 5em;
-        -webkit-text-stroke: 3px $pieceOutline;
+        -webkit-text-stroke: 3px $backgroundLight;
         width: 100%;
         height: 100%;
 
@@ -68,8 +68,8 @@
         @media only screen and (max-width: 425px ) { font-size: 2.0em; -webkit-text-stroke-width: 0.5px; }
 
         &:hover { cursor: pointer; }
-        &.black > i:before { color: $blackPiece; font-family: inherit; }
-        &.white > i:before { color: $whitePiece; font-family: inherit; }
+        &.black > i:before { color: $blackPlayer; font-family: inherit; }
+        &.white > i:before { color: $whitePlayer; font-family: inherit; }
       }
     }
   }

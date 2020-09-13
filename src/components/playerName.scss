@@ -14,8 +14,8 @@
   @media only screen and (max-width: 525px ) { height: 25.0px; }
   @media only screen and (max-width: 425px ) { height: 22.5px; }
 
-  &.white { background-color: $whitePiece; color: $background; }
-  &.black { background-color: $blackPiece; color: $text; }
+  &.white { background-color: $whitePlayer; color: $blackPlayer; }
+  &.black { background-color: $blackPlayer; color: $whitePlayer; }
 
   & > span, & > input {
     width: 100%;

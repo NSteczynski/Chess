@@ -1,8 +1,12 @@
+
 /** The dictionary with string as key. */
 export type Dictionary<T> = { [name: string]: T }
 
 /** The dictionary with enum as key. */
 export type EnumDictionary<T extends string | symbol | number, U> = { [K in T]: U }
+
+/** The game scoreboard. */
+export type Scoreboard = EnumDictionary<PlayerColor, Score>
 
 /** The vector 2D. */
 export interface Vector {
@@ -12,19 +16,7 @@ export interface Vector {
   y: number
 }
 
-/** The game settings. */
-export interface Settings {
-  /** Determines if players should change colors. */
-  flip: boolean
-  /** The game score. */
-  score: EnumDictionary<PlayerColor, Score>
-  /** Determines if game menu should be visible. */
-  showGameMenu: boolean
-  /** The player that has won. */
-  winPlayer?: PlayerColor
-}
-
-/** The game score. */
+/** The score. */
 export interface Score {
   /** The player name of the score. */
   name: string
@@ -32,25 +24,39 @@ export interface Score {
   value: number
 }
 
-/** The app state. */
-export interface AppState {
-  /** Determines which player has move. */
-  playerMove: PlayerColor
-  /** The dictionary of the pieces. */
-  pieces: Dictionary<Piece>
-  /** The dictionary of the selected piece possible moves. */
-  selectedMoves: Dictionary<PieceMove>
-  /** The history of the moves. */
-  historyMoves: Dictionary<HistoryMove>
-  /** The selected piece. */
-  selected?: Piece
-  /** The last move played. */
-  lastMove?: HistoryMove
-  /** The piece that will be promoted. */
-  promotionPiece?: Piece
+/** The game settings. */
+export interface GameSettings {
+  /** The position of coordinates sytem. */
+  coordsPosition: CoordsPosition
+  /** Determines if game menu should be showed. */
+  showGameMenu: boolean
+  /** Determines if coordinates system should be showed. */
+  showCoords: boolean
+  /** Determines if player colors should be flipped. */
+  flip: boolean
 }
 
-/** The piece. */
+/** The game state. */
+export interface GameState {
+  /** The player color that has current move. */
+  playerMove: PlayerColor
+  /** The dictionary of the selected piece moves. */
+  selectedMoves: Dictionary<Move>
+  /** The history of the moves. */
+  history: Dictionary<Move>
+  /** The dictionary of the pieces. */
+  pieces: Dictionary<Piece>
+  /** The last move. */
+  lastMove?: Move
+  /** The piece that is selected. */
+  selected?: Piece
+  /** The player that has won. */
+  winPlayer?: PlayerColor
+  /** The player that want to resign. */
+  resignPlayer?: PlayerColor
+}
+
+/** The player piece. */
 export interface Piece {
   /** The piece color. */
   color: PlayerColor
@@ -58,24 +64,12 @@ export interface Piece {
   type: PieceTypes
   /** The piece position. */
   position: Vector
-  /** Determines if the piece has moved from the start. */
+  /** Determines if piece has moved from the start. */
   hasMoved?: boolean
 }
 
-/** The piece move. */
-export interface PieceMove {
-  /** The move type. */
-  type: MoveTypes
-  /** The move position. */
-  position: Vector
-  /** The piece that has been captured in move. */
-  captured?: Piece
-  /** Determines if piece should promote. Only works if piece.type is PieceTypes.PAWN. */
-  promotion?: boolean
-}
-
-/** The history move. */
-export interface HistoryMove {
+/** The player move. */
+export interface Move {
   /** The move id. */
   id: number
   /** The move type. */
@@ -84,20 +78,26 @@ export interface HistoryMove {
   piece: Piece
   /** The position where piece has moved. */
   position: Vector
-  /** The piece that has been captured in move. */
+  /** The piece that has been captured. */
   captured?: Piece
-  /** Determines if move provides the check. */
+  /** The piece promotion on move. */
+  promotion?: PieceTypes.ROOK | PieceTypes.BISHOP | PieceTypes.QUEEN | "waiting"
+  /** Determines if move provides check. */
   isCheck?: boolean
-  /** Determines if move ends game. */
+  /** Determines if move provides checkmate. */
   isCheckmate?: boolean
-  /** The piece promotion. */
-  promotion?: PieceTypes.ROOK | PieceTypes.BISHOP | PieceTypes.QUEEN
 }
 
 /** The player color. */
 export enum PlayerColor {
   WHITE = "white",
   BLACK = "black"
+}
+
+/** The position of coordinates sytem. */
+export enum CoordsPosition {
+  OUTSIDE = "outside",
+  INSIDE  = "inside"
 }
 
 /** The piece types. */

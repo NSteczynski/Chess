@@ -3,7 +3,9 @@
   flex-direction: column;
   width: 350px;
   height: 800px;
-  background: $container;
+  background: $backgroundLight;
+  border: 1px solid $disabled;
+  border-left: none;
 
   @media only screen and (max-width: 1150px) { width: 325px; height: 700px; }
   @media only screen and (max-width: 1025px) { width: 300px; height: 600px; }
@@ -12,26 +14,9 @@
   @media only screen and (max-width: 525px ) { width: 400px; height: 500px; }
   @media only screen and (max-width: 425px ) { width: 300px; height: 400px; }
 
-  & > .score {
-    padding: 15px 0px;
-    
-    & > p {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 26px;
-      padding: 0px 20px;
+  & > .score { padding: 15px; }
 
-      @media only screen and (max-width: 1150px) { font-size: 25px; }
-      @media only screen and (max-width: 1025px) { font-size: 22px; }
-      @media only screen and (max-width: 900px ) { font-size: 18px; }
-      @media only screen and (max-width: 768px ) { font-size: 16px; }
-      @media only screen and (max-width: 525px ) { font-size: 14px; }
-      @media only screen and (max-width: 425px ) { font-size: 12px; }
-    }
-  }
-
-  & > .movesHistory {
+  & > .history {
     height: 100%;
     overflow-y: auto;
     border-top: 1px solid $disabled;
@@ -49,14 +34,13 @@
         justify-content: center;
         padding: 5px 0px;
         width: 50%;
-        color: $text;
         font-size: 18px;
 
         @media only screen and (max-width: 768px ) { font-size: 13px; }
 
         &:hover { cursor: pointer; }
         &.active { font-weight: bold; }
-        &:nth-child(4n + 3), &:nth-child(4n + 4) { background: $lightContainer; }
+        &:nth-child(4n + 3), &:nth-child(4n + 4) { background: $backgroundLighter; }
         &:nth-child(2n + 1) {
           counter-increment: line;
 
@@ -73,27 +57,12 @@
     }
   }
 
-  & > .actions {
-    display: flex;
-    flex-direction: row;
+  & > .actions > button {
     width: 100%;
+    padding: 15px;
 
-    & > button {
-      width: 100%;
-      font-size: 26px;
-      padding: 15px;
-
-      @media only screen and (max-width: 1150px) { font-size: 25px; }
-      @media only screen and (max-width: 1025px) { font-size: 22px; }
-      @media only screen and (max-width: 900px ) { font-size: 18px; }
-      @media only screen and (max-width: 768px ) { font-size: 17px; padding: 10px; }
-      @media only screen and (max-width: 525px ) { font-size: 16px; }
-      @media only screen and (max-width: 425px ) { font-size: 15px; }
-
-      &:hover { background: $lightContainer; cursor: pointer; }
-      & > i:before { font-family: inherit; }
-      &:disabled:hover { background: transparent; cursor: auto; }
-      &:disabled > i:before { color: $disabled; }
-    }
+    @media only screen and (max-width: 768px ) { font-size: 17px; padding: 10px; }
+    &:disabled:hover { background: $backgroundLight; cursor: auto; }
+    &:disabled > i:before { color: $disabled; }
   }
 }

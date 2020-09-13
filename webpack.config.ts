@@ -1,19 +1,19 @@
-const CopyWebpackPlugin = require("copy-webpack-plugin")
-const HTMLWebpackPlugin = require("html-webpack-plugin")
+import CopyWebpackPlugin from "copy-webpack-plugin"
+import HTMLWebpackPlugin from "html-webpack-plugin"
 
 module.exports = {
-  entry: './src/index.tsx',
+  entry:   './src/index.tsx',
   devtool: 'inline-source-map',
   output: {
-    path: __dirname + '/dist',
-    filename: '[name].js'
+    filename: '[name].js',
+    path: __dirname + '/dist'
   },
   optimization: {
     splitChunks: {
       cacheGroups: {
         vendor: {
-          test: /[\\/]node_modules[\\/]/,
-          name: 'vendor',
+          test:   /[\\/]node_modules[\\/]/,
+          name:   'vendor',
           chunks: 'all'
         }
       }
@@ -22,20 +22,23 @@ module.exports = {
   module: {
     rules: [
       { test: /\.ts(x?)$/, loader: 'ts-loader', exclude: /node_modules/ },
-      { test: /\.scss$/, loader: 'style-loader!css-loader!sass-loader' }
+      { test: /\.scss$/, loader: 'style-loader!css-loader!sass-loader'  }
     ]
   },
   resolve: {
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
+    alias: {
+      "@components": __dirname + "/src/components",
+      "@core":       __dirname + "/src/core",
+      "@app":        __dirname + "/src"
+    }
   },
   devServer: {
-    port: 8080,
-    historyApiFallback: true
+    historyApiFallback: true,
+    port: 8080
   },
   plugins: [
     new CopyWebpackPlugin({ patterns: [{ from: 'public/favicon.ico' }]}),
-    new HTMLWebpackPlugin({
-      template: './public/index.html'
-    })
+    new HTMLWebpackPlugin({ template: './public/index.html'           })
   ],
 }
