@@ -47,8 +47,15 @@ const App: React.FunctionComponent<{}> = () => {
   const onNewGame = (): void => {
     const whitePlayer = createPlayerPieces(PlayerColor.WHITE, 6, false)
     const blackPlayer = createPlayerPieces(PlayerColor.BLACK, 0, true)
-    setSettings(() => ({ ...DefaultSettings, showGameMenu: false }))
-    return setState({ ...DefaultAppState, pieces: { ...whitePlayer, ...blackPlayer }, playerMove: PlayerColor.WHITE })
+    setState({ ...DefaultAppState, pieces: { ...whitePlayer, ...blackPlayer }, playerMove: PlayerColor.WHITE })
+    return setSettings(prevState => ({
+      ...DefaultSettings,
+      score: {
+        [PlayerColor.WHITE]: { name: prevState.score[PlayerColor.WHITE].name, value: DefaultSettings.score[PlayerColor.BLACK].value },
+        [PlayerColor.BLACK]: { name: prevState.score[PlayerColor.BLACK].name, value: DefaultSettings.score[PlayerColor.BLACK].value }
+      },
+      showGameMenu: false
+    }))
   }
 
   const onGameRematch = (): void => {
