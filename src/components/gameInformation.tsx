@@ -8,12 +8,14 @@ const GameInformation: React.FunctionComponent<{
   flip: boolean
   historyMoves: Dictionary<HistoryMove>
   lastMove: HistoryMove | undefined
+  isShowGameMenuDisabled: boolean
   isBackwardDisabled: boolean
   isForwardDisabled: boolean
   onHistoryMoveClick: (move: HistoryMove) => void
+  onShowGameMenuClick: () => void
   onBackwardHistoryClick: () => void
   onForwardHistoryClick: () => void
-}> = ({ score, flip, historyMoves, lastMove, onHistoryMoveClick, isBackwardDisabled, isForwardDisabled, onBackwardHistoryClick, onForwardHistoryClick }) => (
+}> = ({ score, flip, historyMoves, lastMove, onHistoryMoveClick, isShowGameMenuDisabled, isBackwardDisabled, isForwardDisabled, onShowGameMenuClick, onBackwardHistoryClick, onForwardHistoryClick }) => (
   <div className="gameInformation">
     <div className="score">
       <p>
@@ -28,8 +30,9 @@ const GameInformation: React.FunctionComponent<{
       onHistoryMoveClick={onHistoryMoveClick}
     />
     <div className="actions">
-      <button onClick={onBackwardHistoryClick} disabled={isBackwardDisabled}><i className="fas fa-chevron-left" ></i></button>
-      <button onClick={onForwardHistoryClick } disabled={isForwardDisabled }><i className="fas fa-chevron-right"></i></button>
+      <button onClick={onShowGameMenuClick   } disabled={isShowGameMenuDisabled}><i className="fas fa-plus" /></button>
+      <button onClick={onBackwardHistoryClick} disabled={isBackwardDisabled    }><i className="fas fa-chevron-left"  /></button>
+      <button onClick={onForwardHistoryClick } disabled={isForwardDisabled     }><i className="fas fa-chevron-right" /></button>
     </div>
   </div>
 )

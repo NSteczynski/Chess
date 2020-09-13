@@ -18,6 +18,8 @@ export interface Settings {
   flip: boolean
   /** The game score. */
   score: EnumDictionary<PlayerColor, Score>
+  /** Determines if game menu should be visible. */
+  showGameMenu: boolean
   /** The player that has won. */
   winPlayer?: PlayerColor
 }

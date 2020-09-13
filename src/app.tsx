@@ -22,7 +22,7 @@ const App: React.FunctionComponent<{}> = () => {
     const color = getLastObject(state.historyMoves)?.isCheckmate ? getLastObject(state.historyMoves).piece.color : PlayerColor.WHITE
     const newScore = state.lastMove?.isCheckmate ? settings.score[color].value + 1 : settings.score[color].value - 1
     const winPlayer = state.lastMove?.isCheckmate ? color : undefined
-    return setSettings(prevState => ({ ...prevState, score: { ...prevState.score, [color]: { ...prevState.score[color], value: newScore } }, winPlayer }))
+    return setSettings(prevState => ({ ...prevState, score: { ...prevState.score, [color]: { ...prevState.score[color], value: newScore } }, winPlayer, showGameMenu: winPlayer != undefined }))
   }, [state.lastMove != undefined && state.lastMove.isCheckmate])
 
   const createPlayerPieces = (color: PlayerColor, offsetY: number, switchRows: boolean): Dictionary<Piece> => {
@@ -47,16 +47,14 @@ const App: React.FunctionComponent<{}> = () => {
   const onNewGame = (): void => {
     const whitePlayer = createPlayerPieces(PlayerColor.WHITE, 6, false)
     const blackPlayer = createPlayerPieces(PlayerColor.BLACK, 0, true)
-    if (settings.score[PlayerColor.WHITE].value > 0 || settings.score[PlayerColor.BLACK].value > 0)
-      setSettings(DefaultSettings)
+    setSettings(() => ({ ...DefaultSettings, showGameMenu: false }))
     return setState({ ...DefaultAppState, pieces: { ...whitePlayer, ...blackPlayer }, playerMove: PlayerColor.WHITE })
   }
 
   const onGameRematch = (): void => {
     const whitePlayer = createPlayerPieces(PlayerColor.WHITE, 6, false)
     const blackPlayer = createPlayerPieces(PlayerColor.BLACK, 0, true)
-    if (settings.score[PlayerColor.WHITE].value > 0 || settings.score[PlayerColor.BLACK].value > 0)
-      setSettings(prevState => ({ ...prevState, flip: !prevState.flip, winPlayer: undefined }))
+    setSettings(prevState => ({ ...prevState, flip: !prevState.flip, winPlayer: undefined, showGameMenu: false }))
     return setState({ ...DefaultAppState, pieces: { ...whitePlayer, ...blackPlayer }, playerMove: PlayerColor.WHITE })
   }
 
@@ -157,6 +155,10 @@ const App: React.FunctionComponent<{}> = () => {
     return updateAfterHistoryChange(move, pieces)
   }
 
+  const onShowGameMenuClick = (): void => {
+    return setSettings(prevState => ({ ...prevState, showGameMenu: !prevState.showGameMenu }))
+  }
+
   const onBackwardHistoryClick = (): void => {
     const historyMove = state.historyMoves[Object.keys(state.historyMoves).reverse().find(key => state.lastMove && state.historyMoves[key].id < state.lastMove.id) as string]
     if (historyMove == undefined && state.lastMove != undefined)
@@ -217,7 +219,7 @@ const App: React.FunctionComponent<{}> = () => {
   return (
     <React.Fragment>
       <div className="gameContainer">
-        {(settings.winPlayer || !Object.keys(state.pieces).length) && <GameMenu
+        {settings.showGameMenu && <GameMenu
           {...settings}
           onNewGame={onNewGame}
           onGameRematch={onGameRematch}
@@ -241,9 +243,11 @@ const App: React.FunctionComponent<{}> = () => {
         flip={settings.flip}
         historyMoves={state.historyMoves}
         lastMove={state.lastMove}
+        isShowGameMenuDisabled={settings.showGameMenu && !Object.keys(state.pieces).length}
         isBackwardDisabled={isBackwardDisabled}
         isForwardDisabled={isForwardDisabled}
         onHistoryMoveClick={onHistoryMoveClick}
+        onShowGameMenuClick={onShowGameMenuClick}
         onBackwardHistoryClick={onBackwardHistoryClick}
         onForwardHistoryClick={onForwardHistoryClick}
       />
