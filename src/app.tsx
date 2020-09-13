@@ -60,6 +60,12 @@ const App: React.FunctionComponent<{}> = () => {
     return setState({ ...DefaultAppState, pieces: { ...whitePlayer, ...blackPlayer }, playerMove: PlayerColor.WHITE })
   }
 
+  const onPlayerNameChange = (name: string, color: PlayerColor): void => {
+    if (name.length > 14)
+      return undefined
+    return setSettings(prevState => ({ ...prevState, score: { ...prevState.score, [color]: { ...prevState.score[color], name } } }))
+  }
+
   const onCellClick = (position: Vector): void => {
     if (state.promotionPiece != undefined)
       return undefined
@@ -211,7 +217,12 @@ const App: React.FunctionComponent<{}> = () => {
   return (
     <React.Fragment>
       <div className="gameContainer">
-        {(settings.winPlayer || !Object.keys(state.pieces).length) && <GameMenu {...settings} onNewGame={onNewGame} onGameRematch={onGameRematch} />}
+        {(settings.winPlayer || !Object.keys(state.pieces).length) && <GameMenu
+          {...settings}
+          onNewGame={onNewGame}
+          onGameRematch={onGameRematch}
+          onPlayerNameChange={onPlayerNameChange}
+        />}
         <Board
           playerMove={state.playerMove}
           pieces={state.pieces}

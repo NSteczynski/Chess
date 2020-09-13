@@ -6,18 +6,19 @@ const PlayerName: React.FunctionComponent<{
   name: string
   color: PlayerColor
   flip: boolean
-}> = ({ name, color, flip }) => {
+  onChange?: (name: string, color: PlayerColor) => void
+}> = ({ name, color, flip, onChange }) => {
   const [fontSize, setFontSize] = React.useState<number>(0)
   const container = React.useRef<HTMLSpanElement>(null)
   const className = "playerName " + (flip ? getOppositeColor(color) : color)
 
   React.useEffect(() => {
-    window.addEventListener("resize", () => setFontSize(changeFontSize()))
-    return window.removeEventListener("resize", () => setFontSize(changeFontSize()))
+    window.addEventListener("resize", () => setFontSize(changeFontSize(fontSize)))
+    return window.removeEventListener("resize", () => setFontSize(changeFontSize(fontSize)))
   }, [])
 
   React.useEffect(() => {
-    return setFontSize(changeFontSize())
+    return setFontSize(changeFontSize(fontSize))
   }, [name, fontSize])
 
   const changeFontSize = (initial: number = 1, isMax?: boolean): number => {
@@ -56,7 +57,7 @@ const PlayerName: React.FunctionComponent<{
 
   return (
     <span ref={container} className={className}>
-      <span style={{ fontSize }}>{name}</span>
+      {onChange == undefined ? <span style={{ fontSize }}>{name}</span> : <input type="text" style={{ fontSize }} value={name} onChange={event => onChange(event.currentTarget.value, color)} />}
     </span>
   )
 }
